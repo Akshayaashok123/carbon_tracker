@@ -26,7 +26,7 @@ from datetime import datetime, date as dt_date, timedelta
 import concurrent.futures
 from werkzeug.middleware.proxy_fix import ProxyFix
 from gmail_handler import fetch_recent_orders
-from google_auth_oauthlib.flow import InstalledAppFlow
+from google_auth_oauthlib.flow import Flow
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 
@@ -946,11 +946,11 @@ def gmail_auth():
                 "message": "Download OAuth 2.0 credentials from Google Cloud and save to data/gmail_credentials.json"
             }), 400
         
-        flow = InstalledAppFlow.from_client_secrets_file(
+        flow = Flow.from_client_secrets_file(
             GMAIL_CREDENTIALS_FILE,
-            GMAIL_SCOPES
+            scopes=GMAIL_SCOPES,
+            state=session.get('gmail_state')
         )
-        
         # Use the same host the user is currently on (localhost vs 127.0.0.1)
         redirect_uri = f"{request.host_url.rstrip('/')}/api/gmail/callback"
         flow.redirect_uri = redirect_uri
@@ -984,9 +984,9 @@ def gmail_callback():
             return "Error: No authorization code received", 400
         
         # Exchange code for credentials
-        flow = InstalledAppFlow.from_client_secrets_file(
+        flow = Flow.from_client_secrets_file(
             GMAIL_CREDENTIALS_FILE,
-            GMAIL_SCOPES
+            scopes=GMAIL_SCOPES
         )
         flow.redirect_uri = session.get('gmail_redirect_uri') or f"{request.host_url.rstrip('/')}/api/gmail/callback"
         code_verifier = session.get('gmail_code_verifier')
