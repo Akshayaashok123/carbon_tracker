@@ -752,25 +752,6 @@
     try {
       let syncItems = [];
 
-      // Check Gmail
-      const gmailRes = await fetch("/api/gmail/status");
-      const gmailStatus = await gmailRes.json();
-      
-      if (gmailStatus.connected) {
-        const ordersRes = await fetch("/api/gmail/orders");
-        const ordersData = await ordersRes.json();
-        if (ordersData.orders && ordersData.orders.length > 0) {
-          ordersData.orders.slice(0, 3).forEach(order => {
-            syncItems.push({
-              source: 'Gmail',
-              label: `${order.platform}: ${order.restaurant}`,
-              impact: `${order.carbon_estimate}kg CO₂`,
-              onSync: `logGmailOrder(${JSON.stringify(order).replace(/"/g, '&quot;')})`
-            });
-          });
-        }
-      }
-
       // Check Strava
       const stravaToken = localStorage.getItem('strava_access_token');
       if (stravaToken) {
@@ -806,25 +787,6 @@
     } catch (err) { console.error("Sync error:", err); }
   }
 
-  window.logGmailOrder = async (order) => {
-    const user = SESSION.username || localStorage.getItem("eco_user");
-    try {
-      const res = await fetch("/api/gmail/log-order", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username: user,
-          department: SESSION.department || "General",
-          ...order
-        })
-      });
-      const data = await res.json();
-      if (data.success) {
-        alert(data.message);
-        loadDashboard();
-      }
-    } catch (err) { alert("Failed to log order"); }
-  };
 
   // ── LEADERBOARD ─────────────────────────────────────────
 
@@ -1240,19 +1202,7 @@
     } catch (err) { alert("Failed to connect Strava"); }
   };
 
-  window.connectGmail = async () => {
-    try {
-      const btn = document.getElementById("gmailConnectBtnOnboarding");
-      if (btn) btn.innerHTML = "Opening Gmail...";
-      const res = await fetch("/api/gmail/auth");
-      const data = await res.json();
-      if (data.url) {
-        window.open(data.url, "Gmail Auth", "width=600,height=800");
-      } else if (data.error) {
-        alert(data.message || data.error);
-      }
-    } catch (err) { alert("Failed to connect Gmail"); }
-  };
+
 
   // ── SMART FOOD LOGGING ──────────────────────────────────
   window.toggleFoodList = function() {
@@ -1352,11 +1302,6 @@
         const btn = document.getElementById("stravaConnectBtnOnboarding");
         if (btn) btn.innerHTML = "✅ Strava Linked";
         alert("Strava Account Linked! 🚴 Your activities will be synced.");
-      }
-      if (event.data === 'gmail_connected') {
-        const btn = document.getElementById("gmailConnectBtnOnboarding");
-        if (btn) btn.innerHTML = "✅ Gmail Linked";
-        alert("Gmail Account Linked! 📧 Your food orders will be auto-calculated.");
       }
     });
   });
