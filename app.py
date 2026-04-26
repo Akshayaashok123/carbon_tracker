@@ -52,7 +52,8 @@ except ImportError:
     logger.warning("flask-limiter not installed — rate limiting disabled.")
 
 GMAIL_SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
-GMAIL_CREDENTIALS_FILE = 'data/gmail_credentials.json'
+# Render puts secret files in the root directory, local dev uses data/
+GMAIL_CREDENTIALS_FILE = 'gmail_credentials.json' if os.path.exists('gmail_credentials.json') else 'data/gmail_credentials.json'
 GMAIL_TOKEN_FILE = 'data/gmail_token.json'
 
 # --- Configuration (loaded from .env) ---
