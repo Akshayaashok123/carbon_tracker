@@ -24,8 +24,7 @@ except Exception as e:
 import io
 from datetime import datetime, date as dt_date, timedelta
 import concurrent.futures
-from google.auth.transport.requests import Request
-from google.oauth2.credentials import Credentials
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 load_dotenv()
 
