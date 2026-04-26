@@ -1,0 +1,11 @@
+Flask==3.0.0
+flask-cors
+requests
+pytesseract
+Pillow
+google-auth-oauthlib
+google-auth-httplib2
+google-api-python-client
+python-dotenv
+waitress
+flask-limiter

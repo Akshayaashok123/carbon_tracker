@@ -1,0 +1,479 @@
+{
+    "a": {
+        "entries": [
+            4.98,
+            6.48,
+            2.7,
+            2.7,
+            2.7,
+            3.39
+        ],
+        "avg_carbon": 3.83,
+        "department": "CSE",
+        "daily_logs": [
+            {
+                "date": "2026-03-16",
+                "total": 3.39,
+                "transport": "car_solo",
+                "food_value": 1.5,
+                "elec_co2": 1.2
+            }
+        ],
+        "badges": [
+            "green_day"
+        ],
+        "streak": 1
+    },
+    "f": {
+        "entries": [
+            2.7
+        ],
+        "avg_carbon": 2.7
+    },
+    "s": {
+        "entries": [
+            67.23
+        ],
+        "avg_carbon": 67.23
+    },
+    "ak": {
+        "entries": [
+            4.38
+        ],
+        "avg_carbon": 4.38,
+        "department": "CSE"
+    },
+    "Ak": {
+        "entries": [
+            4.63,
+            4.63,
+            4.63,
+            4.39
+        ],
+        "avg_carbon": 4.57,
+        "department": "CSE",
+        "daily_logs": [
+            {
+                "date": "2026-03-16",
+                "total": 4.63,
+                "transport": "car_solo",
+                "food_value": 1.5,
+                "elec_co2": 1.2
+            },
+            {
+                "date": "2026-03-16",
+                "total": 4.63,
+                "transport": "car_solo",
+                "food_value": 1.5,
+                "elec_co2": 1.2
+            },
+            {
+                "date": "2026-03-18",
+                "total": 4.63,
+                "transport": "car_solo",
+                "food_value": 1.5,
+                "elec_co2": 1.2
+            },
+            {
+                "date": "2026-03-18",
+                "total": 4.39,
+                "transport": "car_solo",
+                "food_value": 1.5,
+                "elec_co2": 1.2
+            }
+        ],
+        "badges": [
+            "green_day"
+        ],
+        "streak": 1
+    },
+    "Akshaya": {
+        "entries": [
+            4.36,
+            2.7,
+            2.7,
+            2.7,
+            2.7,
+            2.7,
+            2.7,
+            2.7,
+            2.7,
+            2.7,
+            2.7,
+            2.0,
+            2.0,
+            2.0,
+            2.0,
+            2.0,
+            2.0,
+            2.0,
+            2.0,
+            2.0,
+            3.5
+        ],
+        "avg_carbon": 2.52,
+        "department": "Computer Science",
+        "daily_logs": [
+            {
+                "date": "2026-03-18",
+                "total": 4.36,
+                "transport": "car_solo",
+                "food_value": 1.5,
+                "elec_co2": 1.2
+            },
+            {
+                "date": "2026-03-28",
+                "total": 2.7,
+                "transport": "car_solo",
+                "food_value": 1.5,
+                "elec_co2": 1.2
+            },
+            {
+                "date": "2026-03-28",
+                "total": 2.7,
+                "transport": "car_solo",
+                "food_value": 1.5,
+                "elec_co2": 1.2
+            },
+            {
+                "date": "2026-03-29",
+                "total": 2.7,
+                "transport": "car_solo",
+                "food_value": 1.5,
+                "elec_co2": 1.2
+            },
+            {
+                "date": "2026-03-29",
+                "total": 2.7,
+                "transport": "car_solo",
+                "food_value": 1.5,
+                "elec_co2": 1.2
+            },
+            {
+                "date": "2026-03-29",
+                "total": 2.7,
+                "transport": "walk",
+                "food_value": 1.5,
+                "elec_co2": 1.2,
+                "compost": false,
+                "solar": false,
+                "water_usage": 15
+            },
+            {
+                "date": "2026-03-29",
+                "total": 2.7,
+                "transport": "car_solo",
+                "food_value": 1.5,
+                "elec_co2": 1.2,
+                "compost": false,
+                "solar": false,
+                "water_usage": 45
+            },
+            {
+                "date": "2026-03-29",
+                "total": 2.7,
+                "transport": "car_solo",
+                "food_value": 1.5,
+                "elec_co2": 1.2,
+                "compost": false,
+                "solar": false,
+                "water_usage": 45
+            },
+            {
+                "date": "2026-03-29",
+                "total": 2.7,
+                "transport": "car_solo",
+                "food_value": 1.5,
+                "elec_co2": 1.2,
+                "compost": false,
+                "solar": false,
+                "water_usage": 45
+            },
+            {
+                "date": "2026-04-04",
+                "total": 2.7,
+                "transport": "car_solo",
+                "food_value": 1.5,
+                "elec_co2": 1.2,
+                "compost": false,
+                "solar": false,
+                "water_usage": 45
+            },
+            {
+                "date": "2026-04-05",
+                "total": 2.7,
+                "transport": "car_solo",
+                "food_value": 1.5,
+                "elec_co2": 1.2,
+                "compost": true,
+                "solar": true,
+                "water_usage": null
+            },
+            {
+                "date": "2026-04-05",
+                "total": 2.0,
+                "transport": "car_solo",
+                "food_value": 1.5,
+                "elec_co2": 0.0,
+                "compost": false,
+                "solar": false,
+                "water_usage": null
+            },
+            {
+                "date": "2026-04-05",
+                "total": 2.0,
+                "transport": "bicycle",
+                "food_value": 0.8,
+                "elec_co2": 1.2,
+                "compost": false,
+                "solar": false,
+                "water_usage": null
+            },
+            {
+                "date": "2026-04-15",
+                "total": 2.0,
+                "transport": "bicycle",
+                "food_value": 0.8,
+                "elec_co2": 1.2,
+                "compost": false,
+                "solar": false,
+                "water_usage": null
+            },
+            {
+                "date": "2026-04-15",
+                "total": 2.0,
+                "transport": "bicycle",
+                "food_value": 0.8,
+                "elec_co2": 1.2,
+                "compost": false,
+                "solar": false,
+                "water_usage": null
+            },
+            {
+                "date": "2026-04-15",
+                "total": 2.0,
+                "transport": "bicycle",
+                "food_value": 0.8,
+                "elec_co2": 1.2,
+                "compost": false,
+                "solar": false,
+                "water_usage": null
+            },
+            {
+                "date": "2026-04-15",
+                "total": 2.0,
+                "transport": "bicycle",
+                "food_value": 0.8,
+                "elec_co2": 1.2,
+                "compost": false,
+                "solar": false,
+                "water_usage": null
+            },
+            {
+                "date": "2026-04-15",
+                "total": 2.0,
+                "transport": "bicycle",
+                "food_value": 0.8,
+                "elec_co2": 1.2,
+                "compost": false,
+                "solar": false,
+                "water_usage": null
+            },
+            {
+                "date": "2026-04-15",
+                "total": 2.0,
+                "transport": "bicycle",
+                "food_value": 0.8,
+                "elec_co2": 1.2,
+                "compost": false,
+                "solar": false,
+                "water_usage": null
+            },
+            {
+                "date": "2026-04-15",
+                "total": 2.0,
+                "transport": "bicycle",
+                "food_value": 0.8,
+                "elec_co2": 1.2,
+                "compost": false,
+                "solar": false,
+                "water_usage": null
+            },
+            {
+                "date": "2026-04-26",
+                "total": 3.5,
+                "transport": "bicycle",
+                "food_value": 2.3,
+                "elec_co2": 1.2,
+                "compost": false,
+                "solar": false,
+                "water_usage": null,
+                "calories": 0
+            }
+        ],
+        "badges": [
+            "carbon_positive",
+            "low_energy",
+            "green_day",
+            "first_walker",
+            "first_cyclist",
+            "vegan_week",
+            "frequent_rider",
+            "solar_sentinel",
+            "vegan_day"
+        ],
+        "streak": 1,
+        "points": 16930,
+        "total_calories": 0
+    },
+    "FinalTester": {
+        "entries": [
+            2.7
+        ],
+        "avg_carbon": 2.7,
+        "department": "Engineering",
+        "daily_logs": [
+            {
+                "date": "2026-03-29",
+                "total": 2.7,
+                "transport": "car_solo",
+                "food_value": 1.5,
+                "elec_co2": 1.2,
+                "compost": true,
+                "solar": true,
+                "water_usage": 25
+            }
+        ],
+        "badges": [
+            "solar_sentinel",
+            "green_day"
+        ],
+        "streak": 1,
+        "points": 150
+    },
+    "DebugUser": {
+        "entries": [
+            2.0
+        ],
+        "avg_carbon": 2.0,
+        "department": "General",
+        "daily_logs": [
+            {
+                "date": "2026-03-29",
+                "total": 2.0,
+                "transport": "car_solo",
+                "food_value": 1.5,
+                "elec_co2": 0.0,
+                "compost": true,
+                "solar": false,
+                "water_usage": null
+            }
+        ],
+        "badges": [
+            "green_day",
+            "low_energy"
+        ],
+        "streak": 1,
+        "points": 150
+    },
+    "FinalDebug": {
+        "entries": [
+            2.0
+        ],
+        "avg_carbon": 2.0,
+        "department": "General",
+        "daily_logs": [
+            {
+                "date": "2026-03-29",
+                "total": 2.0,
+                "transport": "car_solo",
+                "food_value": 1.5,
+                "elec_co2": 0.0,
+                "compost": true,
+                "solar": false,
+                "water_usage": null
+            }
+        ],
+        "badges": [
+            "low_energy",
+            "green_day"
+        ],
+        "streak": 1,
+        "points": 150
+    },
+    "DebugUser3": {
+        "entries": [
+            2.0
+        ],
+        "avg_carbon": 2.0,
+        "department": "General",
+        "daily_logs": [
+            {
+                "date": "2026-03-29",
+                "total": 2.0,
+                "transport": "car_solo",
+                "food_value": 1.5,
+                "elec_co2": 0.0,
+                "compost": true,
+                "solar": false,
+                "water_usage": null
+            }
+        ],
+        "badges": [
+            "green_day",
+            "low_energy"
+        ],
+        "streak": 1,
+        "points": 150
+    },
+    "FinalDebug55": {
+        "entries": [
+            2.5
+        ],
+        "avg_carbon": 2.5,
+        "department": "General",
+        "daily_logs": [
+            {
+                "date": "2026-03-29",
+                "total": 2.5,
+                "transport": "car_solo",
+                "food_value": 1.5,
+                "elec_co2": 0.0,
+                "compost": false,
+                "solar": false,
+                "water_usage": null
+            }
+        ],
+        "badges": [
+            "green_day",
+            "low_energy"
+        ],
+        "streak": 1,
+        "points": 150
+    },
+    "QA": {
+        "entries": [
+            2.7
+        ],
+        "avg_carbon": 2.7,
+        "department": "Computer Science",
+        "daily_logs": [
+            {
+                "date": "2026-03-29",
+                "total": 2.7,
+                "transport": "metro",
+                "food_value": 1.5,
+                "elec_co2": 1.2,
+                "compost": true,
+                "solar": true,
+                "water_usage": 10
+            }
+        ],
+        "badges": [
+            "green_day",
+            "solar_sentinel"
+        ],
+        "streak": 1,
+        "points": 150
+    }
+}

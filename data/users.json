@@ -1,0 +1,44 @@
+{
+  "users": {
+    "axsh_ya02": {
+      "entries": [
+        {
+          "date": "2026-03-15",
+          "carbon": 3.7,
+          "breakdown": {
+            "commute": 0,
+            "electricity": 1.2,
+            "food": 2.5
+          }
+        }
+      ],
+      "total_carbon": 3.7
+    },
+    "ak": {
+      "entries": [
+        {
+          "date": "2026-03-15",
+          "carbon": 4.3,
+          "breakdown": {
+            "commute": 0,
+            "electricity": 1.8,
+            "food": 2.5
+          }
+        }
+      ],
+      "total_carbon": 4.3
+    }
+  },
+  "leaderboard": [
+    {
+      "username": "axsh_ya02",
+      "avg_carbon": 3.7,
+      "entries_count": 1
+    },
+    {
+      "username": "ak",
+      "avg_carbon": 4.3,
+      "entries_count": 1
+    }
+  ]
+}
