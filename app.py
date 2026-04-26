@@ -24,6 +24,7 @@ except Exception as e:
 import io
 from datetime import datetime, date as dt_date, timedelta
 import concurrent.futures
+from werkzeug.middleware.proxy_fix import ProxyFix
 from gmail_handler import fetch_recent_orders
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
@@ -36,6 +37,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(me
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 CORS(app)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY") or secrets.token_hex(32)
 
