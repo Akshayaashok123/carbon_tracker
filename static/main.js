@@ -171,6 +171,20 @@
       const syncBtn = document.getElementById("stravaSyncBtn");
 
       if (res.status === 401) {
+        // Fallback to demo mode if not authenticated
+        try {
+            const demoRes = await fetch("/api/strava/demo");
+            const demoData = await demoRes.json();
+            if (demoData.success) {
+                renderActivitiesFeed(demoData.activities, true);
+                if (connectBtn) connectBtn.style.display = "flex";
+                if (syncBtn) syncBtn.style.display = "none";
+                return;
+            }
+        } catch(e) {
+            console.error("Demo fetch failed:", e);
+        }
+
         if (feed) feed.innerHTML = `
           <div style='text-align:center; padding:40px; color:var(--text-dim);'>
              <h3>Not Connected</h3>
@@ -189,8 +203,20 @@
 
       if (!data.success) throw new Error("Failed to load activity - " + data.error);
       
-      const activities = data.activities || [];
+      renderActivitiesFeed(data.activities || [], false);
       
+      if (data.rewarded_points) {
+        // Just silently update local session cache if needed
+      }
+    } catch (err) {
+      console.error(err);
+      const feed = document.getElementById("activity-feed");
+      if (feed) feed.innerHTML = "<p style='color:#f87171'>Could not load activity data.</p>";
+    }
+  }
+
+  function renderActivitiesFeed(activities, isDemo = false) {
+      const feed = document.getElementById("activity-feed");
       if (activities.length === 0) {
         if (feed) feed.innerHTML = "<p style='color:var(--text-dim)'>No recent activities recorded.</p>";
         return;
@@ -198,7 +224,14 @@
       
       // Render activity feed
       if (feed) {
-        feed.innerHTML = activities.map(act => `
+        let html = "";
+        if (isDemo) {
+            html += `<div style="background:rgba(252,76,2,0.1); border:1px solid rgba(252,76,2,0.3); border-radius:12px; padding:15px; margin-bottom:20px; text-align:center;">
+                <p style="color:#fc4c02; font-size:0.85rem; font-weight:800; margin:0;">Viewing Demo Mode. Connect your Strava account to see real data.</p>
+            </div>`;
+        }
+        
+        html += activities.map(act => `
           <div class="pulse-card" style="margin-bottom:15px; border-left: 4px solid var(--primary);">
             <div style="font-size:2rem;">${act.type === 'Run' ? '🏃' : '🚴'}</div>
             <div style="flex:1;">
@@ -213,6 +246,7 @@
             </div>
           </div>
         `).join("");
+        feed.innerHTML = html;
       }
       
       // Initialize map with the most recent activity's polyline
@@ -220,15 +254,6 @@
       if (latestAct && latestAct.polyline) {
         setTimeout(() => drawActivityMap(latestAct.polyline), 200); // Wait for DOM layout
       }
-      
-      if (data.rewarded_points) {
-        // Just silently update local session cache if needed
-      }
-    } catch (err) {
-      console.error(err);
-      const feed = document.getElementById("activity-feed");
-      if (feed) feed.innerHTML = "<p style='color:#f87171'>Could not load activity data.</p>";
-    }
   }
 
   function drawActivityMap(encodedPolyline) {
@@ -1294,7 +1319,28 @@
       if (document.getElementById("loginDept")) document.getElementById("loginDept").value = localStorage.getItem("eco_dept") || "Computer Science";
     }
     // Set initial screen
-    window.showScreen("screen-onboarding");
+    const urlParams = new URLSearchParams(window.location.search);
+    const stravaError = urlParams.get('strava_error');
+    if (stravaError) {
+        let msg = "Strava connection failed.";
+        if (stravaError === 'athlete_limit') {
+            msg = "Strava connection failed: The developer application has reached its connected athlete limit. Showing demo data instead.";
+        } else if (stravaError === 'denied') {
+            msg = "Strava connection was denied or cancelled.";
+        } else if (stravaError === 'network' || stravaError === 'token_fail') {
+            msg = "Failed to communicate securely with Strava. Please try again later.";
+        }
+        
+        // Remove from URL so it doesn't show on refresh
+        window.history.replaceState({}, document.title, window.location.pathname + window.location.hash);
+        
+        setTimeout(() => {
+            alert(msg);
+            showScreen("screen-activity");
+        }, 500);
+    } else {
+        window.showScreen("screen-onboarding");
+    }
 
     // Listen for OAuth callbacks from popups
     window.addEventListener('message', async (event) => {
