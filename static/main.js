@@ -1430,18 +1430,19 @@
             body: JSON.stringify({ name: '' })
           });
           const testData = await testRes.json();
-          // If we get 403, Google is configured — hide dev login
+          // If we get 403, Google is configured — hide dev login, show Google
           if (testRes.status === 403) {
             if (devSection) devSection.style.display = 'none';
             if (googleBtn) googleBtn.style.display = 'flex';
           } else {
-            // Dev login available — show both options
+            // Dev login available (Google credentials missing) — show dev login, hide google
             if (devSection) devSection.style.display = 'block';
-            if (googleBtn) googleBtn.style.display = 'flex';
+            if (googleBtn) googleBtn.style.display = 'none';
           }
         } catch(e) {
           // Server not reachable — show dev login as fallback
           if (devSection) devSection.style.display = 'block';
+          if (googleBtn) googleBtn.style.display = 'none';
         }
       }
     } catch (err) {
