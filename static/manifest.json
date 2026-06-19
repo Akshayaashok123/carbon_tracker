@@ -1,0 +1,22 @@
+{
+  "name": "EcoTracker",
+  "short_name": "EcoTracker",
+  "description": "Track your daily carbon footprint, earn badges, and lead your campus to a sustainable future.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#050A0E",
+  "theme_color": "#050A0E",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/static/app_icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "lifestyle", "utilities"],
+  "lang": "en",
+  "dir": "ltr"
+}

@@ -1,6 +1,6 @@
 (function () {
   // ── STATE ──────────────────────────────────────────────
-  const SESSION = { username: "", department: "" };
+  const SESSION = { username: "", department: "", email: "", avatar_url: "" };
   const selectedCoords = { origin: null, destination: null };
   let _lbCurrentTab = 'overall';
 
@@ -133,23 +133,26 @@
       document.getElementById("profile-name").textContent = SESSION.username;
       document.getElementById("profile-dept").textContent = SESSION.department;
       
-      const avatar = document.getElementById("profile-avatar");
-      if (avatar) {
-        avatar.textContent = SESSION.username.charAt(0).toUpperCase();
+      const emailEl = document.getElementById("profile-email");
+      if (emailEl) emailEl.textContent = SESSION.email || '';
+      
+      // Show Google avatar if available
+      const avatarImg = document.getElementById("profile-avatar-img");
+      const avatarDiv = document.getElementById("profile-avatar");
+      if (SESSION.avatar_url && avatarImg) {
+        avatarImg.src = SESSION.avatar_url;
+        avatarImg.style.display = 'block';
+        if (avatarDiv) avatarDiv.style.display = 'none';
+      } else if (avatarDiv) {
+        if (avatarImg) avatarImg.style.display = 'none';
+        avatarDiv.style.display = 'flex';
+        avatarDiv.textContent = SESSION.username.charAt(0).toUpperCase();
         const h = [...SESSION.username].reduce((acc, c) => acc + c.charCodeAt(0), 0) % 360;
-        avatar.style.background = `linear-gradient(135deg, hsl(${h}, 60%, 40%), hsl(${(h+30)%360}, 70%, 25%))`;
+        avatarDiv.style.background = `linear-gradient(135deg, hsl(${h}, 60%, 40%), hsl(${(h+30)%360}, 70%, 25%))`;
       }
     } else if (form && profile) {
       form.style.display = "block";
       profile.style.display = "none";
-      
-      // Auto-fill from local storage if available but not in session yet
-      const savedUser = localStorage.getItem("eco_user");
-      const savedDept = localStorage.getItem("eco_dept");
-      if (savedUser && !document.getElementById("loginName").value) {
-        document.getElementById("loginName").value = savedUser;
-        document.getElementById("loginDept").value = savedDept || "Computer Science";
-      }
     }
   };
 
@@ -500,7 +503,14 @@
     }
   };
 
+  // ── GOOGLE OAUTH LOGIN ─────────────────────────────────
+  window.loginWithGoogle = function() {
+    const dept = document.getElementById('loginDept')?.value || 'General';
+    window.location.href = `/auth/google?dept=${encodeURIComponent(dept)}`;
+  };
+
   window.startApp = function () {
+    // Dev-mode fallback login (name-based, only when Google OAuth not configured)
     const nameInp = document.getElementById("loginName");
     const deptInp = document.getElementById("loginDept");
     
@@ -510,35 +520,105 @@
       nameInp.placeholder = "Name is required!";
       return;
     }
-    
-    // Set Session State
-    SESSION.username = rawName;
-    SESSION.department = deptInp?.value;
-    
-    // Persistence
-    localStorage.setItem("eco_user", rawName);
-    localStorage.setItem("eco_dept", SESSION.department);
-    
-    // UI Unlock
-    const nav = document.getElementById("mainNav");
-    if (nav) {
-      nav.classList.remove("hidden");
-      nav.style.display = "flex";
-      nav.style.opacity = "1";
-    }
-    
-    // Play transition sound
-    if (typeof SFX !== "undefined") SFX.catch();
-    
-    window.showScreen("screen-dashboard"); 
+
+    fetch('/auth/dev-login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: rawName, department: deptInp?.value || 'General' })
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success && data.user) {
+        setSession(data.user);
+        window.showScreen('screen-dashboard');
+      } else {
+        alert(data.error || 'Login failed');
+      }
+    })
+    .catch(err => {
+      console.error('Dev login error:', err);
+      alert('Could not connect to server.');
+    });
   };
 
+  function setSession(user) {
+    SESSION.username = user.name || '';
+    SESSION.department = user.department || 'General';
+    SESSION.email = user.email || '';
+    SESSION.avatar_url = user.avatar_url || '';
+    
+    // Persistence (used as fallback for API calls that still use username)
+    localStorage.setItem('eco_user', SESSION.username);
+    localStorage.setItem('eco_dept', SESSION.department);
+    
+    // Show nav
+    const nav = document.getElementById('mainNav');
+    if (nav) {
+      nav.classList.remove('hidden');
+      nav.style.display = 'flex';
+      nav.style.opacity = '1';
+    }
+    
+    if (typeof SFX !== 'undefined') SFX.catch();
+  }
+
   window.logout = function() {
-    SESSION.username = "";
-    SESSION.department = "";
-    localStorage.removeItem("eco_user");
-    localStorage.removeItem("eco_dept");
-    window.showScreen("screen-onboarding");
+    fetch('/auth/logout', { method: 'POST' })
+    .then(() => {
+      SESSION.username = '';
+      SESSION.department = '';
+      SESSION.email = '';
+      SESSION.avatar_url = '';
+      localStorage.removeItem('eco_user');
+      localStorage.removeItem('eco_dept');
+      window.showScreen('screen-onboarding');
+    })
+    .catch(() => {
+      // Fallback: clear locally even if server call fails
+      SESSION.username = '';
+      SESSION.department = '';
+      localStorage.removeItem('eco_user');
+      localStorage.removeItem('eco_dept');
+      window.showScreen('screen-onboarding');
+    });
+  };
+
+  // ── DATA PRIVACY ────────────────────────────────────────
+  window.exportMyData = async function() {
+    try {
+      const res = await fetch('/api/export-my-data');
+      if (res.status === 401) return alert('Please log in first.');
+      const data = await res.json();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `ecotracker_data_${SESSION.username || 'export'}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      alert('Export failed: ' + err.message);
+    }
+  };
+
+  window.deleteMyAccount = async function() {
+    if (!confirm('⚠️ This will permanently delete your account and ALL data. This cannot be undone. Are you sure?')) return;
+    if (!confirm('This is your last chance. Type nothing and click OK to confirm deletion.')) return;
+    try {
+      const res = await fetch('/api/delete-account', { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        alert('Your account has been deleted. Goodbye! 🌱');
+        SESSION.username = '';
+        SESSION.department = '';
+        localStorage.clear();
+        window.location.reload();
+      } else {
+        alert(data.error || 'Deletion failed');
+      }
+    } catch (err) {
+      alert('Error: ' + err.message);
+    }
   };
 
   window.redeemTree = async function() {
@@ -1312,13 +1392,63 @@
   }
 
   // Init
-  document.addEventListener("DOMContentLoaded", () => {
-    const savedUser = localStorage.getItem("eco_user");
-    if (savedUser) {
-      if (document.getElementById("loginName")) document.getElementById("loginName").value = savedUser;
-      if (document.getElementById("loginDept")) document.getElementById("loginDept").value = localStorage.getItem("eco_dept") || "Computer Science";
+  document.addEventListener("DOMContentLoaded", async () => {
+    // 1. Check server-side auth state via /api/me
+    try {
+      const meRes = await fetch('/api/me');
+      const meData = await meRes.json();
+      
+      if (meData.authenticated && meData.user) {
+        setSession(meData.user);
+        
+        // Check URL params for post-login redirect
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('logged_in') === '1') {
+          window.history.replaceState({}, document.title, '/');
+          window.showScreen('screen-dashboard');
+          return;
+        }
+        if (urlParams.get('auth_error') === '1') {
+          window.history.replaceState({}, document.title, '/');
+          alert('Google login failed. Please try again.');
+          window.showScreen('screen-onboarding');
+          return;
+        }
+      } else {
+        // Not authenticated — check if Google OAuth is configured
+        // If /api/me returns but no auth, show dev login if Google not set up
+        const devSection = document.getElementById('dev-login-section');
+        const googleBtn = document.getElementById('googleLoginBtn');
+        
+        // Try a test: if Google OAuth isn't configured, the /auth/google endpoint
+        // would fail. We show dev login as a fallback.
+        // Simple heuristic: if dev-login endpoint is available, show it
+        try {
+          const testRes = await fetch('/auth/dev-login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: '' })
+          });
+          const testData = await testRes.json();
+          // If we get 403, Google is configured — hide dev login
+          if (testRes.status === 403) {
+            if (devSection) devSection.style.display = 'none';
+            if (googleBtn) googleBtn.style.display = 'flex';
+          } else {
+            // Dev login available — show both options
+            if (devSection) devSection.style.display = 'block';
+            if (googleBtn) googleBtn.style.display = 'flex';
+          }
+        } catch(e) {
+          // Server not reachable — show dev login as fallback
+          if (devSection) devSection.style.display = 'block';
+        }
+      }
+    } catch (err) {
+      console.warn('Auth check failed:', err);
     }
-    // Set initial screen
+
+    // 2. Handle Strava error params
     const urlParams = new URLSearchParams(window.location.search);
     const stravaError = urlParams.get('strava_error');
     if (stravaError) {
@@ -1331,18 +1461,19 @@
             msg = "Failed to communicate securely with Strava. Please try again later.";
         }
         
-        // Remove from URL so it doesn't show on refresh
         window.history.replaceState({}, document.title, window.location.pathname + window.location.hash);
         
         setTimeout(() => {
             alert(msg);
             showScreen("screen-activity");
         }, 500);
-    } else {
+    } else if (!SESSION.username) {
         window.showScreen("screen-onboarding");
+    } else {
+        window.showScreen("screen-dashboard");
     }
 
-    // Listen for OAuth callbacks from popups
+    // 3. Listen for OAuth callbacks from popups
     window.addEventListener('message', async (event) => {
       if (event.data === 'strava_connected') {
         const btn = document.getElementById("stravaConnectBtnOnboarding");

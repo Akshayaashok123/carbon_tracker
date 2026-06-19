@@ -22,3 +22,8 @@ data/gmail_credentials.json
 # OS
 .DS_Store
 Thumbs.db
+
+# Database
+instance/
+*.db
+
