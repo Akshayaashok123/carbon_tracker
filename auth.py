@@ -55,6 +55,8 @@ def google_login():
     session["pending_dept"] = dept
 
     redirect_uri = url_for("auth.google_callback", _external=True)
+    if "localhost" not in request.host and "127.0.0.1" not in request.host:
+        redirect_uri = redirect_uri.replace("http://", "https://", 1)
     return oauth.google.authorize_redirect(redirect_uri)
 
 
