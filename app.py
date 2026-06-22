@@ -111,6 +111,7 @@ BADGE_DEFS = {
     'master_composter':('🔥', 'Master Composter', 'Track organic waste for 30 consecutive days.'),
     'h2o_guardian':   ('💧', 'H2O Guardian',     'Reduce water usage by 20%.'),
     'tree_planter':   ('🌳', 'Tree Planter',     'Redeem 5,000 points for reforestation action.'),
+    'transit_king':   ('👑', 'Transit King',     'Logged a streak of 5+ green days and a day under 2 kg CO₂'),
 }
 
 
@@ -181,6 +182,9 @@ def compute_badges_and_streak(user):
     if len(logs) >= 100:                           earned.add('century')
     if any(l.solar for l in logs):                 earned.add('solar_sentinel')
     if compost_streak >= 30:                       earned.add('master_composter')
+
+    if streak >= 5 and any(t < 2.0 for t in totals):
+        earned.add('transit_king')
 
     if len(water_logs) >= 4:
         baseline = sum(water_logs[:3]) / 3
@@ -737,6 +741,9 @@ def save_entry():
         user.points = (user.points or 0) + 100
         if total <= GREEN_DAY_LIMIT:
             user.points += 50
+        # Extra +100 XP if they chose a green/active/shared transportation mode (not car_solo)
+        if transport != 'car_solo':
+            user.points += 100
 
         user.total_calories = (user.total_calories or 0) + calories
 
@@ -790,12 +797,17 @@ def get_badges(username):
              'name': BADGE_DEFS[bid][1], 'desc': BADGE_DEFS[bid][2]}
             for bid in all_badges if bid in BADGE_DEFS
         ]
+        lvl, title, prog, thresh = user.get_level_info()
         return jsonify({
             'streak': streak,
             'points': user.points or 0,
             'badges': badges,
             'calories': user.total_calories or 0,
             'avg_carbon': user.avg_carbon(),
+            'level': lvl,
+            'level_title': title,
+            'level_progress': prog,
+            'level_threshold': thresh,
         })
     except Exception as e:
         return jsonify({'streak': 0, 'badges': [], 'error': str(e)})
@@ -881,6 +893,26 @@ def redeem_tree():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+def get_user_streak(user):
+    logs = user.daily_logs.order_by(DailyLog.date).all()
+    if not logs:
+        return 0
+    log_dates = sorted({l.date for l in logs}, reverse=True)
+    streak = 0
+    check = dt_date.today()
+    for d in log_dates:
+        if d == check:
+            day_total = min(l.total for l in logs if l.date == d)
+            if day_total <= GREEN_DAY_LIMIT:
+                streak += 1
+                check = check - timedelta(days=1)
+            else:
+                break
+        elif d < check:
+            break
+    return streak
+
+
 @app.route('/api/dept-battle', methods=['GET'])
 def dept_battle():
     try:
@@ -897,6 +929,10 @@ def dept_battle():
             d['logs'] += log_count
             d['total_co2'] += user.avg_carbon()
             d['badges_count'] += user.badges.count()
+            
+            streak = get_user_streak(user)
+            if streak > d['top_streak']:
+                d['top_streak'] = streak
 
         result = []
         for dept, d in dept_map.items():

@@ -53,8 +53,31 @@ class User(UserMixin, db.Model):
     def log_count(self):
         return self.daily_logs.count()
 
+    def get_level_info(self):
+        """
+        Calculate user level and progress based on points.
+        Level thresholds:
+        - Level 1: Carbon Cadet (0 - 499)
+        - Level 2: Eco-Intern (500 - 999)
+        - Level 3: Green Advocate (1000 - 1999)
+        - Level 4: Sustainability Sage (2000 - 2999)
+        - Level 5: Eco-Warrior (3000+)
+        """
+        xp = self.points or 0
+        if xp < 500:
+            return 1, "Carbon Cadet", xp, 500
+        elif xp < 1000:
+            return 2, "Eco-Intern", xp - 500, 500
+        elif xp < 2000:
+            return 3, "Green Advocate", xp - 1000, 1000
+        elif xp < 3000:
+            return 4, "Sustainability Sage", xp - 2000, 1000
+        else:
+            return 5, "Eco-Warrior", xp - 3000, 3000
+
     def to_dict(self):
         """Serialize for API responses."""
+        lvl, title, prog, thresh = self.get_level_info()
         return {
             "id": self.id,
             "name": self.name,
@@ -63,6 +86,10 @@ class User(UserMixin, db.Model):
             "avatar_url": self.avatar_url,
             "points": self.points,
             "total_calories": self.total_calories,
+            "level": lvl,
+            "level_title": title,
+            "level_progress": prog,
+            "level_threshold": thresh,
             "created_at": self.created_at.isoformat() if self.created_at else None,
         }
 

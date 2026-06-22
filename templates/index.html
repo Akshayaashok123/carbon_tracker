@@ -91,7 +91,17 @@
           <div id="profile-avatar" style="width:100px; height:100px; border-radius:50%; margin: 0 auto 20px auto; background:var(--primary); display:flex; align-items:center; justify-content:center; font-size:3rem; color:var(--navy); font-weight:900; box-shadow:var(--shadow-layered);">A</div>
           <h2 id="profile-name" style="font-size:2rem; font-weight:900; margin-bottom:4px;">User Name</h2>
           <p id="profile-email" style="color:var(--text-dim); font-size:0.85rem; font-weight:600; margin-bottom:4px;"></p>
-          <p id="profile-dept" style="color:var(--text-dim); font-weight:700; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:30px;">Department Name</p>
+          <p id="profile-dept" style="color:var(--text-dim); font-weight:700; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:10px;">Department Name</p>
+          <div id="profile-level-badge" style="display:inline-flex; align-items:center; gap:8px; padding:6px 14px; background:rgba(74,222,128,0.1); border:1px solid var(--primary); border-radius:99px; color:var(--primary); font-size:0.85rem; font-weight:800; margin-bottom:20px;">Level 1: Carbon Cadet</div>
+          <div id="profile-level-bar" style="width:100%; max-width:300px; margin: 0 auto 30px auto;">
+            <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:var(--text-dim); font-weight:700; margin-bottom:5px;">
+              <span>XP Progress</span>
+              <span id="profile-level-xp">0 / 500 XP</span>
+            </div>
+            <div style="height:6px; background:rgba(255,255,255,0.05); border-radius:3px; overflow:hidden;">
+              <div id="profile-level-progress" style="height:100%; width:0%; background:var(--primary);"></div>
+            </div>
+          </div>
           
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:20px;">
             <button class="btn-strava" onclick="showScreen('screen-dashboard')" style="background:rgba(74, 222, 128, 0.1); color:var(--primary); border-color:rgba(74, 222, 128, 0.2); margin:0;">Dashboard</button>
@@ -270,7 +280,8 @@
             <a href="#" style="color:var(--primary); text-decoration:underline; text-underline-offset:8px;" onclick="showScreen('screen-dashboard')">Home</a>
           </div>
         </div>
-        <div style="display:flex; align-items:center; gap:25px;">
+        <div style="display:flex; align-items:center; gap:15px;">
+          <div id="top-user-level" style="font-size:0.75rem; font-weight:800; color:var(--primary); background:rgba(74,222,128,0.1); border:1px solid rgba(74,222,128,0.2); padding:4px 10px; border-radius:12px;">Lvl 1</div>
           <div id="top-user-avatar" style="width:40px; height:40px; border-radius:50%; border:2px solid var(--primary); display:flex; align-items:center; justify-content:center; color:white; font-weight:900; background:var(--navy); font-size:1rem;">A</div>
         </div>
       </nav>
@@ -419,6 +430,7 @@
         <button class="lb-tab" id="lb-tab-eng" onclick="switchLbTab('Engineering')">⚙️ Engineering</button>
         <button class="lb-tab" id="lb-tab-arts" onclick="switchLbTab('Arts')">🎨 Arts &amp; Design</button>
         <button class="lb-tab" id="lb-tab-biz" onclick="switchLbTab('Business')">📊 Business</button>
+        <button class="lb-tab" id="lb-tab-battle" onclick="switchLbTab('battle')" style="background:rgba(244,63,94,0.15); border-color:rgba(244,63,94,0.3); color:#f43f5e; font-weight:800;">⚔️ Battle</button>
       </div>
 
       <!-- Current tab label -->
@@ -446,7 +458,10 @@
             <span>Points: <span id="user-points">0</span></span>
             <button onclick="redeemTree()" class="btn-primary" style="padding:10px 20px; font-size:0.75rem; border-radius:10px; margin:0; width:auto;">Redeem for Tree (5k pts)</button>
           </div>
-          <span>Streak: <span id="user-streak">0</span> 🔥</span>
+            <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
+              <span>Streak: <span id="user-streak">0</span> 🔥</span>
+              <span id="user-level" style="font-size:0.85rem; font-weight:800; color:white; background:rgba(255,255,255,0.05); border:1px solid var(--glass-border); padding:4px 10px; border-radius:10px;">Level 1: Carbon Cadet</span>
+            </div>
         </div>
         <div id="badge-grid" class="achievement-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:20px;"></div>
       </div>

@@ -133,6 +133,21 @@
       document.getElementById("profile-name").textContent = SESSION.username;
       document.getElementById("profile-dept").textContent = SESSION.department;
       
+      // Update visual level details on profile screen
+      fetch(`/api/badges/${encodeURIComponent(SESSION.username)}`)
+        .then(res => res.json())
+        .then(data => {
+          const badgeEl = document.getElementById("profile-level-badge");
+          const xpEl = document.getElementById("profile-level-xp");
+          const progressEl = document.getElementById("profile-level-progress");
+          if (badgeEl) badgeEl.textContent = `Level ${data.level || 1}: ${data.level_title || "Carbon Cadet"}`;
+          if (xpEl) xpEl.textContent = `${data.level_progress || 0} / ${data.level_threshold || 500} XP`;
+          if (progressEl) {
+            const pct = Math.min(100, ((data.level_progress || 0) / (data.level_threshold || 500)) * 100);
+            progressEl.style.width = `${pct}%`;
+          }
+        }).catch(err => console.error(err));
+      
       const emailEl = document.getElementById("profile-email");
       if (emailEl) emailEl.textContent = SESSION.email || '';
       
@@ -671,6 +686,10 @@
       const logs = profileData.daily_logs || [];
       const latestLog = logs.length > 0 ? logs[logs.length - 1] : null;
 
+      // Update top bar user level indicator
+      const topLvlEl = document.getElementById("top-user-level");
+      if (topLvlEl) topLvlEl.textContent = `Lvl ${badgeData.level || 1}`;
+
       // UI Updates: Stats — use real data from latest log
       document.getElementById("dash-total").textContent = latestLog ? latestLog.total.toFixed(1) : "0.0";
       const last7 = logs.slice(-7);
@@ -939,7 +958,8 @@
       'Computer Science': 'lb-tab-cs',
       'Engineering': 'lb-tab-eng',
       'Arts': 'lb-tab-arts',
-      'Business': 'lb-tab-biz'
+      'Business': 'lb-tab-biz',
+      'battle': 'lb-tab-battle'
     };
     const activeBtn = document.getElementById(tabMap[dept]);
     if (activeBtn) activeBtn.classList.add('active');
@@ -950,7 +970,8 @@
       'Computer Science': 'Computer Science Department',
       'Engineering': 'Engineering Department',
       'Arts': 'Arts & Design Department',
-      'Business': 'Business School'
+      'Business': 'Business School',
+      'battle': 'Department Battle Standings'
     };
     if (labelEl) labelEl.textContent = `Showing: ${labelMap[dept] || dept}`;
     loadLeaderboard(dept);
@@ -962,6 +983,57 @@
     list.innerHTML = "<p style='text-align:center; padding:40px; color:var(--primary); opacity:0.5;'>Recalculating Rankings...</p>";
 
     try {
+      if (dept === 'battle') {
+        const res = await fetch('/api/dept-battle');
+        const data = await res.json();
+
+        if (!Array.isArray(data) || data.length === 0) {
+          list.innerHTML = `<div style='text-align:center; padding:60px; color:var(--text-dim);'>
+            <div style='font-size:3rem; margin-bottom:16px;'>🏜️</div>
+            <p style='font-weight:800;'>No department data yet.</p>
+          </div>`;
+          return;
+        }
+
+        const MEDALS = ["🥇", "🥈", "🥉"];
+        list.innerHTML = data.map((d, idx) => {
+          const avg = Number(d.avg_co2 || 0).toFixed(1);
+          const name = escapeHTML(d.department || "Other");
+          const isSelf = (d.department || "").toLowerCase() === (SESSION.department || "").toLowerCase();
+          const initial = escapeHTML(name.charAt(0).toUpperCase());
+          const members = d.members || 0;
+
+          const h = [...name].reduce((acc, c) => acc + c.charCodeAt(0), 0) % 360;
+          const grad = `linear-gradient(135deg, hsl(${h}, 70%, 40%), hsl(${(h+40)%360}, 80%, 20%))`;
+
+          const rankMedal = idx < 3
+            ? `<div class="medal">${MEDALS[idx]}</div>`
+            : `<div class="medal" style="font-size:0.8rem; font-weight:900;">${idx+1}</div>`;
+
+          return `
+            <div class="lb-item ${isSelf ? 'active-user' : ''}">
+              <div class="user-avatar" style="background:${grad}; display:flex; align-items:center; justify-content:center; color:white; font-weight:900; font-size:1.5rem; font-family:'Outfit';">
+                ${initial}
+                ${rankMedal}
+              </div>
+              <div class="user-info">
+                <div class="user-name">
+                  ${name}
+                  ${isSelf ? '<span class="badge-you">YOUR DEPT</span>' : ''}
+                </div>
+                <div class="user-dept">${members} member${members !== 1 ? 's' : ''} · ${d.badges_count || 0} badges</div>
+              </div>
+              <div class="user-stat" style="text-align:right;">
+                <span class="stat-val" style="color: ${isSelf ? '#f43f5e' : 'var(--primary)'}">${avg}</span>
+                <span class="stat-lbl">AVG CO2/DAY</span>
+                <div style="font-size:0.65rem; color:var(--text-dim); margin-top:3px; font-weight:800;">🔥 ${d.top_streak || 0} top streak</div>
+              </div>
+            </div>
+          `;
+        }).join("");
+        return;
+      }
+
       const url = dept && dept !== 'overall'
         ? `/api/leaderboard?dept=${encodeURIComponent(dept)}`
         : '/api/leaderboard';
@@ -1043,6 +1115,9 @@
       const data = await res.json();
       if (streakEl) streakEl.textContent = data.streak || 0;
       if (pointsEl) pointsEl.textContent = (data.points || 0).toLocaleString();
+      
+      const lvlEl = document.getElementById("user-level");
+      if (lvlEl) lvlEl.textContent = `Level ${data.level || 1}: ${data.level_title || "Carbon Cadet"}`;
       const badges = data.badges || [];
       if (badges.length === 0) {
         grid.innerHTML = "<p style='grid-column:1/-1; text-align:center; padding:60px; color:var(--text-dim);'>No badges yet.</p>";
