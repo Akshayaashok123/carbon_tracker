@@ -42,6 +42,12 @@ from models import db, User, DailyLog, UserBadge, EventInterest
 from auth import init_auth
 
 app = Flask(__name__)
+
+@app.before_request
+def ignore_content_type_on_get():
+    """Clear stray Content-Type on GET requests to avoid 415 errors."""
+    if request.method == 'GET' and request.headers.get('Content-Type'):
+        request.environ.pop('CONTENT_TYPE', None)
 app.config.from_object(Config)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 CORS(app, supports_credentials=True)
@@ -215,7 +221,11 @@ def get_acting_user(data=None):
         return current_user
 
     if data is None:
-        data = request.json or {}
+        # Only attempt to parse JSON when the request content type is application/json
+        if request.is_json:
+            data = request.get_json()
+        else:
+            data = {}
     username = (data.get('username') or '').strip()[:100]
     if not username:
         return None
@@ -318,7 +328,124 @@ def health_check():
     except Exception as e:
         return jsonify({"status": "unhealthy", "database": str(e)}), 500
 
+@app.route('/api/wallet', methods=['GET', 'POST'])
+def wallet_api():
+    """Handle wallet data.
 
+    GET  – returns the current wallet info (browser‑friendly).
+    POST – accepts JSON payload to update/redeem coins.
+    """
+    if request.method == "GET":
+        user = get_acting_user()
+        if not user:
+            return jsonify({'error': 'Unauthorized'}), 401
+
+        lvl, title, prog, thresh = user.get_level_info()
+        recent_logs = (
+            DailyLog.query.filter_by(user_id=user.id)
+            .order_by(DailyLog.date.desc())
+            .limit(10)
+            .all()
+        )
+        transactions = [
+            {
+                'date': log.date.isoformat(),
+                'total': round(log.total, 2),
+                'transport': log.transport,
+                'calories': log.calories,
+            }
+            for log in recent_logs
+        ]
+
+        return jsonify(
+            {
+                'balance': user.points,
+                'level': lvl,
+                'level_title': title,
+                'progress': prog,
+                'threshold': thresh,
+                'transactions': transactions,
+            }
+        )
+
+
+    # POST handling
+    if not request.is_json:
+        return jsonify({'error': 'Content-Type must be application/json'}), 400
+
+    data = request.get_json()
+    # Expected keys: action (add_points or redeem_points), amount (positive integer)
+    action = data.get('action')
+    amount = data.get('amount', 0)
+
+    if action not in ('add_points', 'redeem_points'):
+        return jsonify({'error': 'Invalid action'}), 400
+    if not isinstance(amount, int) or amount <= 0:
+        return jsonify({'error': 'Amount must be a positive integer'}), 400
+
+    user = get_acting_user()
+    if not user:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    try:
+        if action == 'add_points':
+            user.points += amount
+        else:  # redeem_points
+            if user.points < amount:
+                return jsonify({'error': 'Insufficient points'}), 400
+            user.points -= amount
+
+        # Record a simple wallet transaction using DailyLog as a placeholder
+        from datetime import datetime
+        log = DailyLog(
+            user_id=user.id,
+            date=datetime.utcnow().date(),
+            total=user.points,  # snapshot of current balance
+            transport='wallet_update',
+            calories=0,
+        )
+        db.session.add(log)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        logger.exception('Wallet update failed')
+        return jsonify({'error': 'Internal server error'}), 500
+
+    # Return refreshed wallet data (reuse GET logic for consistency)
+    lvl, title, prog, thresh = user.get_level_info()
+    recent_logs = (
+        DailyLog.query.filter_by(user_id=user.id)
+        .order_by(DailyLog.date.desc())
+        .limit(10)
+        .all()
+    )
+    transactions = [
+        {
+            'date': log.date.isoformat(),
+            'total': round(log.total, 2),
+            'transport': log.transport,
+            'calories': log.calories,
+        }
+        for log in recent_logs
+    ]
+    return jsonify({
+        'balance': user.points,
+        'level': lvl,
+        'level_title': title,
+        'progress': prog,
+        'threshold': thresh,
+        'transactions': transactions,
+        'success': True,
+    })
+
+
+# Deprecated: route registration moved to @app.route decorator
+# app.add_url_rule(
+#     '/api/wallet',
+#     view_func=wallet_api,
+#     methods=['GET', 'POST'],
+#     provide_automatic_options=False,
+# )
 @app.route('/api/autocomplete')
 def autocomplete():
     """Proxy OLA Maps autocomplete — keeps API key off the frontend."""

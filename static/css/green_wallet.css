@@ -1,0 +1,82 @@
+/* Green Wallet Component Styles */
+:root {
+  --emerald-gradient: linear-gradient(135deg, #11998e, #38ef7d);
+  --indigo-gradient: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+#screen-green-wallet .wallet-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  padding: 24px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  margin: 20px auto;
+  max-width: 500px;
+  color: var(--text-light);
+}
+
+.wallet-balance {
+  font-size: 3rem;
+  font-weight: 800;
+  background: var(--emerald-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.wallet-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.wallet-header .icon {
+  font-size: 2.5rem;
+}
+
+.progress-bar {
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(255,255,255,0.1);
+  overflow: hidden;
+  margin-top: 6px;
+}
+.progress-bar .fill {
+  height: 100%;
+  background: var(--indigo-gradient);
+  transition: width 0.4s ease;
+}
+
+.rewards-grid {
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  gap: 12px;
+  margin-top: 16px;
+}
+.rewards-grid .reward-card {
+  background: var(--emerald-gradient);
+  border-radius: 16px;
+  padding: 12px;
+  text-align: center;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  transition: transform 0.2s;
+}
+.rewards-grid .reward-card:hover {
+  transform: translateY(-2px);
+}
+.rewards-grid .reward-card img {
+  max-width: 60px;
+  margin-bottom: 8px;
+}
+
+.transactions-list {
+  margin-top: 12px;
+}
+.transactions-list .tx-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.tx-item .amount { font-weight: 600; }
