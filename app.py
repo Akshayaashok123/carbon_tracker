@@ -72,6 +72,7 @@ OLLAMA_MODEL = Config.OLLAMA_MODEL
 STRAVA_CLIENT_ID = Config.STRAVA_CLIENT_ID
 STRAVA_CLIENT_SECRET = Config.STRAVA_CLIENT_SECRET
 STRAVA_REDIRECT_URI = Config.STRAVA_REDIRECT_URI
+CALORIENINJAS_API_KEY = Config.CALORIENINJAS_API_KEY
 
 TRANSPORT_MODES = {
     'car_solo':   ('driving', 0.171, '🚗 Car (Solo)'),
@@ -509,61 +510,141 @@ def analyze_food_smart():
         text = pytesseract.image_to_string(img)
         source = "receipt"
     else:
-        data = request.json
+        data = request.json or {}
         text = data.get('text', '')
         source = "list"
 
     if not text.strip():
         return jsonify({'error': 'No text or image provided'}), 400
 
-    prompt = f"""You are a nutrition and sustainability expert.
-Analyze this {source} text and extract individual food/drink items.
-For each item:
-1. Estimate Calories (kcal).
-2. Estimate Carbon Footprint (kg CO2e).
-3. Return a clean JSON array of objects with keys: "name", "calories", "co2".
+    # Food carbon estimates per standard portion (~150g)
+    carbon_estimates = {
+        'vegan': 0.8, 'salad': 0.9, 'vegetable': 1.0, 'veg': 1.0,
+        'paneer': 1.8, 'vegetarian': 1.5,
+        'chicken': 2.5, 'fish': 2.3, 'seafood': 2.4,
+        'mutton': 4.5, 'lamb': 5.2, 'beef': 5.2,
+        'butter chicken': 3.2, 'tandoori': 2.8,
+        'biryani': 2.2, 'dal': 1.2, 'curry': 2.0,
+        'pizza': 1.8, 'pasta': 1.5, 'burger': 3.0,
+        'chaat': 1.5, 'samosa': 1.2, 'dosa': 1.3,
+        'thali': 2.0, 'rice': 0.5, 'bread': 0.4,
+    }
 
-Text:
-\"\"\"
-{text}
-\"\"\"
+    items = []
+    total_calories = 0
+    total_co2 = 0.0
 
-Guidelines:
-- If a quantity is mentioned (e.g. "2 Burgers"), calculate for that quantity.
-- If it's a receipt, ignore prices/dates, focus only on food items.
-- Be realistic with estimates.
-- ONLY return the JSON array. No preamble. No markdown blocks."""
+    # Try to query CalorieNinjas API if key is available
+    if CALORIENINJAS_API_KEY:
+        try:
+            url = f"https://api.calorieninjas.com/v1/nutrition?query={requests.utils.quote(text)}"
+            res = requests.get(url, headers={'X-Api-Key': CALORIENINJAS_API_KEY}, timeout=10)
+            res.raise_for_status()
+            api_data = res.json()
+            api_items = api_data.get('items', [])
+            
+            for item in api_items:
+                name = item.get('name', 'Unknown Item').title()
+                calories = item.get('calories', 0)
+                serving_size_g = item.get('serving_size_g', 150)
+                
+                # Match carbon footprint keyword
+                name_lower = name.lower()
+                base_co2 = 1.5  # Default fallback
+                for kw, val in carbon_estimates.items():
+                    if kw in name_lower:
+                        base_co2 = val
+                        break
+                
+                # Scale co2 by weight relative to standard 150g serving
+                co2_estimate = round(base_co2 * (serving_size_g / 150.0), 2)
+                co2_estimate = max(0.1, min(10.0, co2_estimate)) # Cap value
+                
+                items.append({
+                    "name": name,
+                    "calories": round(calories),
+                    "co2": co2_estimate
+                })
+                total_calories += calories
+                total_co2 += co2_estimate
 
-    try:
-        res = requests.post(OLLAMA_URL, json={
-            "model": OLLAMA_MODEL, "prompt": prompt,
-            "stream": False, "options": {"temperature": 0.2, "num_predict": 500}
-        }, timeout=30)
+            if items:
+                return jsonify({
+                    'items': items,
+                    'total_calories': round(total_calories),
+                    'total_co2': round(total_co2, 2),
+                    'text_extracted': text[:200] + "..." if len(text) > 200 else text,
+                    'source': 'calorieninjas'
+                })
+        except Exception as e:
+            logger.warning("CalorieNinjas request failed, falling back: %s", e)
 
-        raw_response = res.json().get("response", "").strip()
-        if "```json" in raw_response:
-            raw_response = raw_response.split("```json")[1].split("```")[0].strip()
-        elif "```" in raw_response:
-            raw_response = raw_response.split("```")[1].split("```")[0].strip()
+    # Local fallback rule-based parser if CalorieNinjas is unconfigured/fails
+    import re
+    lines = [line.strip() for line in text.split('\n') if line.strip()]
+    for line in lines[:10]: # Limit to top 10 items to prevent overload
+        line_lower = line.lower()
+        # Ignore total, prices, card info, dates
+        if any(w in line_lower for w in ['total', 'price', 'tax', 'date', 'visa', 'card', 'cash', 'gst', 'rs', 'inr']):
+            continue
+        
+        # Simple quantity detection (e.g. "2x Pizza" or "2 Pizza" or "Pasta 1")
+        quantity = 1
+        qty_match = re.search(r'\b(\d+)\s*(x|qty)?\b', line_lower)
+        if qty_match:
+            try:
+                quantity = int(qty_match.group(1))
+            except Exception:
+                pass
 
-        items = json.loads(raw_response)
-        total_calories = sum(i.get('calories', 0) for i in items)
-        total_co2 = sum(i.get('co2', 0) for i in items)
+        # Estimate calories & carbon footprint
+        item_calories = 250  # default
+        item_co2 = 1.5       # default
+        detected_name = line.strip().title()
 
-        return jsonify({
-            'items': items,
-            'total_calories': round(total_calories),
-            'total_co2': round(total_co2, 2),
-            'text_extracted': text[:200] + "..." if len(text) > 200 else text
+        matched = False
+        for kw, val in carbon_estimates.items():
+            if kw in line_lower:
+                item_co2 = val
+                # Rough calorie estimates based on food type
+                if kw in ['burger', 'pizza', 'mutton', 'lamb', 'beef']:
+                    item_calories = 500
+                elif kw in ['chicken', 'fish', 'seafood', 'butter chicken', 'biryani', 'pasta']:
+                    item_calories = 400
+                elif kw in ['paneer', 'vegetarian', 'veg', 'curry', 'thali']:
+                    item_calories = 300
+                elif kw in ['vegan', 'salad', 'vegetable', 'dal', 'samosa', 'dosa', 'chaat']:
+                    item_calories = 150
+                elif kw in ['rice', 'bread']:
+                    item_calories = 200
+                matched = True
+                break
+        
+        # Final values scaled by quantity
+        final_calories = item_calories * quantity
+        final_co2 = round(item_co2 * quantity, 2)
+        
+        items.append({
+            "name": detected_name,
+            "calories": final_calories,
+            "co2": final_co2
         })
+        total_calories += final_calories
+        total_co2 += final_co2
 
-    except Exception:
-        return jsonify({
-            'error': 'Smart analysis failed. Using basic estimation.',
-            'items': [{'name': 'Extracted Items', 'calories': 0, 'co2': 1.5}],
-            'total_calories': 0,
-            'total_co2': 1.5
-        })
+    if not items:
+        # Absolute fallback if no items could be parsed
+        items = [{'name': 'Extracted Meal', 'calories': 350, 'co2': 1.5}]
+        total_calories = 350
+        total_co2 = 1.5
+
+    return jsonify({
+        'items': items,
+        'total_calories': round(total_calories),
+        'total_co2': round(total_co2, 2),
+        'text_extracted': text[:200] + "..." if len(text) > 200 else text,
+        'source': 'fallback'
+    })
 
 
 @app.route('/api/ocr-receipt', methods=['POST'])
