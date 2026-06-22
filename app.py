@@ -469,15 +469,29 @@ End with one actionable suggestion. Use 1-2 emojis. Write in natural prose, no b
         res.raise_for_status()
         message = res.json().get("response", "").strip()
         if not message:
-            return jsonify({"error": "Empty response from Ollama"}), 500
+            raise ValueError("Empty response from Ollama")
         return jsonify({"message": message})
 
-    except requests.exceptions.Timeout:
-        return jsonify({"message": "🌿 EcoBot is loading — this takes ~30s first time. Try again!"}), 200
-    except requests.exceptions.ConnectionError:
-        return jsonify({"message": "⚠️ Ollama is not running. Open a terminal and run: ollama serve"}), 200
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        logger.warning("Ollama coaching failed, using local fallback generator: %s", e)
+        
+        # Fallback local tip generator
+        contribs = [
+            ("commute", commute_co2, f"your commute emissions ({commute_co2:.1f} kg CO₂) were your biggest contributor today. Choosing to walk, bike, or take public transit like the bus or metro can significantly lower this!"),
+            ("food", food_co2, f"your food footprint ({food_co2:.1f} kg CO₂) represents a major portion of your emissions. Opting for delicious vegetarian or vegan options is one of the most effective ways to lower your impact!"),
+            ("electricity", elec_co2, f"your energy use ({elec_co2:.1f} kg CO₂) made up a notable part of your daily footprint. Unplugging devices when not in use and turning off lights can save both energy and carbon.")
+        ]
+        contribs.sort(key=lambda x: x[1], reverse=True)
+        biggest_contributor_text = contribs[0][2]
+        
+        alternative_text = ""
+        if greenest and greenest.get('dist') and greenest.get('co2', 999) < commute_co2:
+            alternative_text = f" I noticed you could save carbon by taking a greener route (only {greenest.get('co2')} kg CO₂ for {greenest.get('dist')} km)!"
+        elif cheapest and cheapest.get('co2', 999) < commute_co2:
+            alternative_text = f" Did you know that taking a shared ride could help you reduce your commute emissions to {cheapest.get('co2')} kg CO₂?"
+
+        fallback_msg = f"Hi {username}! 🌿 Your total carbon footprint today is {total_co2:.1f} kg CO₂. {biggest_contributor_text}{alternative_text} Keep up the great work tracking your impact and making green choices! 🌍"
+        return jsonify({"message": fallback_msg})
 
 
 # ── Smart Food Analysis ───────────────────────────────────────
@@ -879,10 +893,129 @@ def load_ecohub_data():
     return {"events": [], "news": []}
 
 
+def load_and_refresh_ecohub_data():
+    data = load_ecohub_data()
+    last_updated_str = data.get("last_updated")
+    needs_refresh = True
+    
+    if last_updated_str:
+        try:
+            last_updated = datetime.fromisoformat(last_updated_str)
+            # Cache for 1 hour
+            if datetime.utcnow() - last_updated < timedelta(hours=1):
+                needs_refresh = False
+        except Exception:
+            pass
+
+    if needs_refresh:
+        # Purge past events
+        today = datetime.today().date()
+        filtered_events = []
+        for ev in data.get('events', []):
+            try:
+                ev_date = datetime.strptime(ev.get('date', ''), "%Y-%m-%d").date()
+                if ev_date >= today:
+                    filtered_events.append(ev)
+            except Exception:
+                # Retain if it doesn't match standard YYYY-MM-DD format (fallback)
+                filtered_events.append(ev)
+
+        # Dynamic template events generator to ensure we always have upcoming events in OMR/Besant Nagar/IITM
+        dynamic_templates = [
+            {
+                "id": "dyn-evt-001",
+                "title": "Besant Nagar Beach Cleanup Drive",
+                "time": "06:00 AM - 09:00 AM",
+                "location": "Besant Nagar Beach, Elliot's Beach, Chennai",
+                "description": "Join volunteers for a massive shoreline cleanup. Help remove plastic waste and microplastics from one of Chennai's most iconic beaches. Gloves and bags provided.",
+                "category": "cleanup",
+                "organizer": "Chennai Coastal Conservation Group",
+                "contact_url": "https://example.com/besant-cleanup",
+                "emoji": "🏖️",
+                "attendees": 187,
+                "max_attendees": 300,
+                "day_offset": 5,
+            },
+            {
+                "id": "dyn-evt-002",
+                "title": "Adyar Eco Park – 1000 Trees Plantation",
+                "time": "07:00 AM - 11:00 AM",
+                "location": "Adyar Eco Park, Adyar, Chennai",
+                "description": "Be part of Chennai's urban reforestation effort! Plant native species like Neem, Peepal, and Banyan. Each sapling absorbs ~22 kg CO₂ per year.",
+                "category": "treePlant",
+                "organizer": "Green Chennai Foundation",
+                "contact_url": "https://example.com/adyar-trees",
+                "emoji": "🌳",
+                "attendees": 342,
+                "max_attendees": 500,
+                "day_offset": 6,
+            },
+            {
+                "id": "dyn-evt-003",
+                "title": "IIT Madras – Carbon Neutrality Workshop",
+                "time": "10:00 AM - 04:00 PM",
+                "location": "IC & SR Auditorium, IIT Madras, Chennai",
+                "description": "A full-day hands-on workshop on measuring your carbon footprint, understanding emission sources, and building personal action plans.",
+                "category": "workshop",
+                "organizer": "IIT Madras Sustainability Cell",
+                "contact_url": "https://example.com/iitm-workshop",
+                "emoji": "🎓",
+                "attendees": 89,
+                "max_attendees": 150,
+                "day_offset": 2,
+            },
+            {
+                "id": "dyn-evt-004",
+                "title": "Marina to Mylapore Eco Cycling Rally",
+                "time": "05:30 AM - 08:00 AM",
+                "location": "Marina Beach Lighthouse (Start Point), Chennai",
+                "description": "Ride 12 km from Marina to Mylapore and back! Promote zero-emission transport and win eco-prizes.",
+                "category": "ecoRide",
+                "organizer": "Pedal Chennai",
+                "contact_url": "https://example.com/eco-ride",
+                "emoji": "🚲",
+                "attendees": 256,
+                "max_attendees": 400,
+                "day_offset": 10,
+            }
+        ]
+
+        # Generate future dates for template events
+        for t in dynamic_templates:
+            event_date = (today + timedelta(days=t["day_offset"])).isoformat()
+            existing_ids = {e.get("id") for e in filtered_events}
+            if t["id"] not in existing_ids:
+                event_copy = t.copy()
+                event_copy.pop("day_offset")
+                event_copy["date"] = event_date
+                filtered_events.append(event_copy)
+
+        data['events'] = filtered_events
+
+        # Refresh live news RSS
+        try:
+            live_news = fetch_live_news(data)
+            if live_news:
+                data['news'] = live_news
+        except Exception as e:
+            logger.warning("Could not refresh live news: %s", e)
+
+        # Update last_updated timestamp and save
+        data['last_updated'] = datetime.utcnow().isoformat()
+        try:
+            os.makedirs(os.path.dirname(ECOHUB_FILE), exist_ok=True)
+            with open(ECOHUB_FILE, "w", encoding="utf-8") as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+        except Exception as e:
+            logger.exception("Failed to save refreshed EcoHub data: %s", e)
+
+    return data
+
+
 @app.route('/api/eco-events')
 def get_eco_events():
     try:
-        data = load_ecohub_data()
+        data = load_and_refresh_ecohub_data()
         events = data.get("events", [])
         category = request.args.get("category", "").strip().lower()
         if category and category != "all":
@@ -935,8 +1068,8 @@ def fetch_live_news(fallback_data):
 @app.route('/api/eco-news')
 def get_eco_news():
     try:
-        data = load_ecohub_data()
-        news = fetch_live_news(data)
+        data = load_and_refresh_ecohub_data()
+        news = data.get("news", [])
         return jsonify({"news": news, "count": len(news)})
     except Exception as e:
         return jsonify({"news": [], "error": str(e)}), 500

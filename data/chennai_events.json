@@ -1,226 +1,143 @@
 {
   "events": [
     {
-      "id": "evt-001",
+      "id": "dyn-evt-001",
       "title": "Besant Nagar Beach Cleanup Drive",
-      "date": "2026-04-20",
       "time": "06:00 AM - 09:00 AM",
       "location": "Besant Nagar Beach, Elliot's Beach, Chennai",
-      "description": "Join 200+ volunteers for a massive shoreline cleanup. Help remove plastic waste and microplastics from one of Chennai's most iconic beaches. Gloves and bags provided.",
+      "description": "Join volunteers for a massive shoreline cleanup. Help remove plastic waste and microplastics from one of Chennai's most iconic beaches. Gloves and bags provided.",
       "category": "cleanup",
       "organizer": "Chennai Coastal Conservation Group",
       "contact_url": "https://example.com/besant-cleanup",
       "emoji": "🏖️",
       "attendees": 187,
-      "max_attendees": 300
+      "max_attendees": 300,
+      "date": "2026-06-27"
     },
     {
-      "id": "evt-002",
+      "id": "dyn-evt-002",
       "title": "Adyar Eco Park – 1000 Trees Plantation",
-      "date": "2026-04-26",
       "time": "07:00 AM - 11:00 AM",
       "location": "Adyar Eco Park, Adyar, Chennai",
-      "description": "Be part of Chennai's urban reforestation effort! Plant native species like Neem, Peepal, and Banyan. Each sapling absorbs ~22 kg CO₂ per year. Refreshments provided.",
+      "description": "Be part of Chennai's urban reforestation effort! Plant native species like Neem, Peepal, and Banyan. Each sapling absorbs ~22 kg CO₂ per year.",
       "category": "treePlant",
       "organizer": "Green Chennai Foundation",
       "contact_url": "https://example.com/adyar-trees",
       "emoji": "🌳",
       "attendees": 342,
-      "max_attendees": 500
+      "max_attendees": 500,
+      "date": "2026-06-28"
     },
     {
-      "id": "evt-003",
+      "id": "dyn-evt-003",
       "title": "IIT Madras – Carbon Neutrality Workshop",
-      "date": "2026-05-03",
       "time": "10:00 AM - 04:00 PM",
       "location": "IC & SR Auditorium, IIT Madras, Chennai",
-      "description": "A full-day hands-on workshop on measuring your carbon footprint, understanding emission sources, and building personal action plans. Led by climate scientists from IIT Madras.",
+      "description": "A full-day hands-on workshop on measuring your carbon footprint, understanding emission sources, and building personal action plans.",
       "category": "workshop",
       "organizer": "IIT Madras Sustainability Cell",
       "contact_url": "https://example.com/iitm-workshop",
       "emoji": "🎓",
       "attendees": 89,
-      "max_attendees": 150
+      "max_attendees": 150,
+      "date": "2026-06-24"
     },
     {
-      "id": "evt-004",
+      "id": "dyn-evt-004",
       "title": "Marina to Mylapore Eco Cycling Rally",
-      "date": "2026-05-10",
       "time": "05:30 AM - 08:00 AM",
       "location": "Marina Beach Lighthouse (Start Point), Chennai",
-      "description": "Ride 12 km from Marina to Mylapore and back! Promote zero-emission transport and win eco-prizes. Helmets mandatory. Open to all age groups.",
+      "description": "Ride 12 km from Marina to Mylapore and back! Promote zero-emission transport and win eco-prizes.",
       "category": "ecoRide",
       "organizer": "Pedal Chennai",
       "contact_url": "https://example.com/eco-ride",
       "emoji": "🚲",
       "attendees": 256,
-      "max_attendees": 400
-    },
-    {
-      "id": "evt-005",
-      "title": "Climate Action Seminar – Road to Net Zero",
-      "date": "2026-05-15",
-      "time": "02:00 PM - 05:00 PM",
-      "location": "Anna University Convention Centre, Guindy, Chennai",
-      "description": "Industry leaders and environmentalists discuss India's Net Zero 2070 target, Chennai's role, and what students can do. Panel discussion + Q&A session.",
-      "category": "seminar",
-      "organizer": "Anna University Green Club",
-      "contact_url": "https://example.com/net-zero-seminar",
-      "emoji": "🎤",
-      "attendees": 120,
-      "max_attendees": 250
-    },
-    {
-      "id": "evt-006",
-      "title": "Pallikaranai Marshland Restoration",
-      "date": "2026-05-22",
-      "time": "06:30 AM - 10:30 AM",
-      "location": "Pallikaranai Marshland, Thoraipakkam, Chennai",
-      "description": "Help restore one of Chennai's last remaining wetlands! Activities include invasive species removal, native plant seeding, and bird habitat setup. A unique hands-on conservation experience.",
-      "category": "cleanup",
-      "organizer": "Care Earth Trust",
-      "contact_url": "https://example.com/pallikaranai",
-      "emoji": "🦆",
-      "attendees": 75,
-      "max_attendees": 120
-    },
-    {
-      "id": "evt-007",
-      "title": "Solar Energy for Homes – DIY Workshop",
-      "date": "2026-05-28",
-      "time": "09:00 AM - 01:00 PM",
-      "location": "Chennai Trade Centre, Nandambakkam, Chennai",
-      "description": "Learn how rooftop solar panels work, calculate your home's solar potential, and understand government subsidies. Hands-on demo with mini solar kits included.",
-      "category": "workshop",
-      "organizer": "SolarTN Initiative",
-      "contact_url": "https://example.com/solar-workshop",
-      "emoji": "☀️",
-      "attendees": 158,
-      "max_attendees": 200
-    },
-    {
-      "id": "evt-008",
-      "title": "OMR Corridor – Tree Guard Installation",
-      "date": "2026-06-01",
-      "time": "07:00 AM - 10:00 AM",
-      "location": "OMR IT Corridor, Sholinganallur, Chennai",
-      "description": "Protect newly planted saplings along the IT corridor by installing tree guards. Each tree saved removes 25+ kg CO₂ annually. Bring a friend!",
-      "category": "treePlant",
-      "organizer": "Environmentalist Foundation of India",
-      "contact_url": "https://example.com/omr-trees",
-      "emoji": "🛡️",
-      "attendees": 93,
-      "max_attendees": 150
-    },
-    {
-      "id": "evt-009",
-      "title": "E-Waste Collection Drive – Velachery",
-      "date": "2026-06-07",
-      "time": "09:00 AM - 05:00 PM",
-      "location": "Phoenix MarketCity, Velachery, Chennai",
-      "description": "Drop off old electronics, batteries, and cables for responsible recycling. E-waste in landfills releases toxic CO₂ and heavy metals. Free drop-off, certificates provided.",
-      "category": "cleanup",
-      "organizer": "E-Waste Solutions India",
-      "contact_url": "https://example.com/ewaste-drive",
-      "emoji": "♻️",
-      "attendees": 210,
-      "max_attendees": 500
-    },
-    {
-      "id": "evt-010",
-      "title": "Green Campus Challenge – Inter-College",
-      "date": "2026-06-14",
-      "time": "10:00 AM - 06:00 PM",
-      "location": "SRM University, Kattankulathur, Chennai",
-      "description": "Compete across colleges in sustainability challenges: waste audit, carbon calculation, upcycling, and eco-quiz. Winning team gets ₹50,000 green fund!",
-      "category": "workshop",
-      "organizer": "Tamil Nadu State Environment Department",
-      "contact_url": "https://example.com/green-campus",
-      "emoji": "🏆",
-      "attendees": 450,
-      "max_attendees": 600
+      "max_attendees": 400,
+      "date": "2026-07-02"
     }
   ],
   "news": [
     {
-      "id": "news-001",
-      "title": "Chennai Metro Expansion to Cut City's Carbon Emissions by 12%",
-      "source": "The Hindu",
-      "date": "2026-04-12",
-      "summary": "The Phase-2 expansion of Chennai Metro Rail, covering 118.9 km, is projected to reduce the city's transport emissions by 12% once fully operational. Officials say it will take 2 lakh vehicles off the road daily.",
-      "url": "https://www.thehindu.com",
-      "category": "news",
-      "emoji": "🚇"
-    },
-    {
-      "id": "news-002",
-      "title": "Tamil Nadu Achieves 50% Renewable Energy Milestone",
-      "source": "Times of India",
-      "date": "2026-04-10",
-      "summary": "Tamil Nadu has crossed the 50% mark in renewable energy generation, driven by massive wind and solar installations in southern districts. Chennai's rooftop solar adoption surged 34% this year.",
-      "url": "https://timesofindia.indiatimes.com",
-      "category": "news",
-      "emoji": "⚡"
-    },
-    {
-      "id": "news-003",
-      "title": "Miyawaki Forests Sprout Across Chennai's IT Corridor",
-      "source": "Indian Express",
-      "date": "2026-04-08",
-      "summary": "Over 15 Miyawaki micro-forests have been planted along Chennai's OMR stretch in the past year, each containing 300-800 native trees. These dense forests absorb CO₂ 30x faster than conventional plantations.",
-      "url": "https://indianexpress.com",
-      "category": "news",
-      "emoji": "🌿"
-    },
-    {
-      "id": "news-004",
-      "title": "Chennai Corporation Launches Free Compost Bins for 10,000 Homes",
-      "source": "Deccan Chronicle",
-      "date": "2026-04-05",
-      "summary": "In a push towards zero-waste, the Greater Chennai Corporation is distributing free composting bins to households across 15 zones. Composting can reduce a family's carbon footprint by 0.5 tonnes per year.",
-      "url": "https://www.deccanchronicle.com",
-      "category": "news",
-      "emoji": "🗑️"
-    },
-    {
-      "id": "news-005",
-      "title": "Electric Bus Fleet Doubles: TNSTC Adds 500 New EV Buses",
+      "id": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxNM25rN0ZlRUVRSmVRblV1ZjdUZXVfcjJFanMxVldxYzl1RmJvQzlFekZ0QUNCdWs5OGlTZ3ZRQjRyLURXeXhyRnBzQkVLREVralB6QWliQjBwRjJ2aGUtSmJ6X3lrM1Z5ZjV2NGVxUGNja1RNVUpxTGk4MkctY0J0Q0R3WDN2b0lCcC1MbU1LUVBQcHozeU0tRmlJVTFxS0NwWDViX0hjOXJPYkVUMjR0Nk1rZXhyU2FXZGtZSTlycnpaemt3SXZlV1BhRG1EVU5uQk1WYtIB4gFBVV95cUxNVHpwdzA2S2p0OTZxenZFQWc3LWJwLXlIU01MNHdvRXZITDdpRGVwT3FEdkx2YV9oM19taEJWUklyaWY1TTJHQ1U3ZXVhNWpwTFRXYzB2MHpwWTVvQ2xCbXJpM0d1dTY4UDNsMnM0WUpNcXNEUlJVM2N2Y3dnUi1xRVlyZUYtNWxmZU5MWkZBUEU1bTNyMU9Gc05wRUxfclljclVqSGd5T3NOUVpWVmtfam1Lcm1jSHh1MkI2dTlnb0Etd1pyS0luRi1JOEZMM2Q2b29pUjRwRWN5VmM5Y1Z4U3dR?oc=5",
+      "title": "‘Cool roofs not enough, formulate heat-safety guideline for schools’: Activists",
       "source": "The New Indian Express",
-      "date": "2026-04-01",
-      "summary": "Tamil Nadu State Transport Corporation has inducted 500 electric buses, with 200 deployed in Chennai alone. Each e-bus saves 60 tonnes of CO₂ annually compared to diesel counterparts.",
-      "url": "https://www.newindianexpress.com",
+      "date": "Mon, 22 Jun 2026 02:37:42 GMT",
+      "summary": "Live update from The New Indian Express",
+      "url": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxNM25rN0ZlRUVRSmVRblV1ZjdUZXVfcjJFanMxVldxYzl1RmJvQzlFekZ0QUNCdWs5OGlTZ3ZRQjRyLURXeXhyRnBzQkVLREVralB6QWliQjBwRjJ2aGUtSmJ6X3lrM1Z5ZjV2NGVxUGNja1RNVUpxTGk4MkctY0J0Q0R3WDN2b0lCcC1MbU1LUVBQcHozeU0tRmlJVTFxS0NwWDViX0hjOXJPYkVUMjR0Nk1rZXhyU2FXZGtZSTlycnpaemt3SXZlV1BhRG1EVU5uQk1WYtIB4gFBVV95cUxNVHpwdzA2S2p0OTZxenZFQWc3LWJwLXlIU01MNHdvRXZITDdpRGVwT3FEdkx2YV9oM19taEJWUklyaWY1TTJHQ1U3ZXVhNWpwTFRXYzB2MHpwWTVvQ2xCbXJpM0d1dTY4UDNsMnM0WUpNcXNEUlJVM2N2Y3dnUi1xRVlyZUYtNWxmZU5MWkZBUEU1bTNyMU9Gc05wRUxfclljclVqSGd5T3NOUVpWVmtfam1Lcm1jSHh1MkI2dTlnb0Etd1pyS0luRi1JOEZMM2Q2b29pUjRwRWN5VmM5Y1Z4U3dR?oc=5",
       "category": "news",
-      "emoji": "🚌"
+      "emoji": "📰"
     },
     {
-      "id": "news-006",
-      "title": "Students Lead Carbon-Neutral Campus Movement in Chennai",
-      "source": "Hindustan Times",
-      "date": "2026-03-28",
-      "summary": "A coalition of 12 Chennai colleges has pledged to achieve carbon neutrality by 2030. Initiatives include solar-powered hostels, bicycle-only zones, and campus food forests.",
-      "url": "https://www.hindustantimes.com",
-      "category": "news",
-      "emoji": "🎓"
-    },
-    {
-      "id": "news-007",
-      "title": "Cooum River Restoration Shows Promising Results in Emission Reduction",
+      "id": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxQSG9pd011blhFV1NOWUl5bkpVc3MzdGk5N1dTLW9BbjVNSHRZUDFkdzF1Y2JUcU04NVY2YkNBMGIwV1h1MEdRNkZSXzRBdmZtdzM5NlBoaE01aGVTek9CNWlUTnNSc0Qyb0JGRzhMNkZiYkFXeS1vRUhzVXI3ZWFzc0I2WW9lN0tfQUV3X1JObXNWZGhCaDA4SFBlNVZySGgyZmtidzNVZEhnelU0UjVkdm9SRVRmeTZ4SjV6T2FzaE93SzBCa3g5aWp5aUQtRFpaYl9sZNIB2wFBVV95cUxOZnljQTQwRWl3STVTMWpUTnVmQnFMckJzWmJtYlJKUlB0TTJBUjdNOS12YTR5RkU2VFBWTG1YV3N1NUZieXIzalgyUUpZZDNpZldHU3JlX3dmT0Y4ZUdwNFB2NzhIblNyMl85QmF6a1FyX2VfMVRJNDU1VlQyMEc3ZzAyRkpJaDMyenExcm05dDlVMTk5a2xQOXZDWmpMWjlkZEhaSkVSQ1BubEJsdUxvVDVsUHlQRzgxWW5UcTMwTkRnNWpSSEI2QVRYX1VtQmhrd3VucmlQSmtxX2c?oc=5",
+      "title": "Chennai may see 1°C rise in summer temperatures by 2040: Report",
       "source": "The Hindu",
-      "date": "2026-03-22",
-      "summary": "The ongoing Cooum River restoration project has reduced methane emissions from the river by 40% in treated stretches. Healthy rivers act as carbon sinks, absorbing CO₂ from the atmosphere.",
-      "url": "https://www.thehindu.com",
+      "date": "Fri, 05 Jun 2026 07:00:00 GMT",
+      "summary": "Live update from The Hindu",
+      "url": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxQSG9pd011blhFV1NOWUl5bkpVc3MzdGk5N1dTLW9BbjVNSHRZUDFkdzF1Y2JUcU04NVY2YkNBMGIwV1h1MEdRNkZSXzRBdmZtdzM5NlBoaE01aGVTek9CNWlUTnNSc0Qyb0JGRzhMNkZiYkFXeS1vRUhzVXI3ZWFzc0I2WW9lN0tfQUV3X1JObXNWZGhCaDA4SFBlNVZySGgyZmtidzNVZEhnelU0UjVkdm9SRVRmeTZ4SjV6T2FzaE93SzBCa3g5aWp5aUQtRFpaYl9sZNIB2wFBVV95cUxOZnljQTQwRWl3STVTMWpUTnVmQnFMckJzWmJtYlJKUlB0TTJBUjdNOS12YTR5RkU2VFBWTG1YV3N1NUZieXIzalgyUUpZZDNpZldHU3JlX3dmT0Y4ZUdwNFB2NzhIblNyMl85QmF6a1FyX2VfMVRJNDU1VlQyMEc3ZzAyRkpJaDMyenExcm05dDlVMTk5a2xQOXZDWmpMWjlkZEhaSkVSQ1BubEJsdUxvVDVsUHlQRzgxWW5UcTMwTkRnNWpSSEI2QVRYX1VtQmhrd3VucmlQSmtxX2c?oc=5",
       "category": "news",
-      "emoji": "🏞️"
+      "emoji": "📰"
     },
     {
-      "id": "news-008",
-      "title": "How Chennai's Cyclists Are Saving 500 Tonnes of CO₂ Monthly",
-      "source": "Scroll.in",
-      "date": "2026-03-18",
-      "summary": "Chennai's growing cycling community, now 15,000+ strong, collectively prevents an estimated 500 tonnes of CO₂ emissions every month by choosing pedals over petrol.",
-      "url": "https://scroll.in",
+      "id": "https://news.google.com/rss/articles/CBMioAFBVV95cUxPZVBxbnpSN08tdU15czBObUhFTHRpakxxY1FSZzBBR01rTkFPeTMxeklyeVBPR0Y5eW5VZzFuSG1SNkZQbTljMXFLOWZJb01ZODRpN216SjE2TVJmVDVoVENYV2dsVGIwV3FzQXBlQm9JUkMtbENFLU0yN3pDenFDLW54OTZwcFNHcGNPY0lVSlU2M3M1UVhqUEtuMFQ1dWJa0gGuAUFVX3lxTE9DOWJmUEk3RWdhOVNLWEphYldjTTJ4anRhQTFxYkNFNy13bGdKbDVRRVduTzYwOTB5cTB2RGtTLUFrLWZMZWd1bm1waEdzanl4MWR2Q2RvZ0tGbTVNZlFVVkxUMWJ1NmttWUtIb1Z2SDJPMGJWNXhfakhaWHJvTmhjcHBHMEstbzR5WkFIY0dGZ2p0UFZocHlPTzlsYW1laExveUVPQ0h0M3lyeE5tQQ?oc=5",
+      "title": "Chennai Corporation expands cool roof initiative to 55 schools",
+      "source": "DT Next",
+      "date": "Sat, 20 Jun 2026 13:54:35 GMT",
+      "summary": "Live update from DT Next",
+      "url": "https://news.google.com/rss/articles/CBMioAFBVV95cUxPZVBxbnpSN08tdU15czBObUhFTHRpakxxY1FSZzBBR01rTkFPeTMxeklyeVBPR0Y5eW5VZzFuSG1SNkZQbTljMXFLOWZJb01ZODRpN216SjE2TVJmVDVoVENYV2dsVGIwV3FzQXBlQm9JUkMtbENFLU0yN3pDenFDLW54OTZwcFNHcGNPY0lVSlU2M3M1UVhqUEtuMFQ1dWJa0gGuAUFVX3lxTE9DOWJmUEk3RWdhOVNLWEphYldjTTJ4anRhQTFxYkNFNy13bGdKbDVRRVduTzYwOTB5cTB2RGtTLUFrLWZMZWd1bm1waEdzanl4MWR2Q2RvZ0tGbTVNZlFVVkxUMWJ1NmttWUtIb1Z2SDJPMGJWNXhfakhaWHJvTmhjcHBHMEstbzR5WkFIY0dGZ2p0UFZocHlPTzlsYW1laExveUVPQ0h0M3lyeE5tQQ?oc=5",
       "category": "news",
-      "emoji": "🚲"
+      "emoji": "📰"
+    },
+    {
+      "id": "https://news.google.com/rss/articles/CBMivgFBVV95cUxQUngwNGRDcXpBemU4QVk2dS12WEFQbXkwNTJiUTZXbGh0bHJwbmE5U0Vad1dWeDdpVnBUcnUwVDVJTlBaRVRDOTRZTXd5UzgyQ0l5VjZMeWJnTXV5NDdEZDIxVVdjdlVCOEo2VmhCYzB0N2xEdnZiZnlyYXVEdVg2N0ctbjBNajlLR01XN2s4SGpmSXFra3BSS2ZGd21leG1FTEptckJJTE9lVVZZbTBfclFqaDU5WW01X2VXSTVB0gHDAUFVX3lxTE9KamRMTnRmb0xCWGlTY2g0aHp1c1VyY3g4SGw0elQ2eDNJTk5pNjdVcWxVaVp5bzZOUjlSM21KYkRYc3gxU1ZoOW50VUhUWE1DR2tCLUtvM01lM3N1YkxXSnI2MWRnVjQzUmNNcjRnTWhkSk9zcDlyQ3UxRVJFRXdRdnRDMHZsTlc4UER0ZXRhbHJxcWxYYlFaaHpCaEZsaWM1bklDNnB2a2xvanRLNUZhQVNLZ1JNMTVYbUlNZWYxUGZPNA?oc=5",
+      "title": "‘India needs a climate change policy for elders’",
+      "source": "The Times of India",
+      "date": "Tue, 16 Jun 2026 09:20:00 GMT",
+      "summary": "Live update from The Times of India",
+      "url": "https://news.google.com/rss/articles/CBMivgFBVV95cUxQUngwNGRDcXpBemU4QVk2dS12WEFQbXkwNTJiUTZXbGh0bHJwbmE5U0Vad1dWeDdpVnBUcnUwVDVJTlBaRVRDOTRZTXd5UzgyQ0l5VjZMeWJnTXV5NDdEZDIxVVdjdlVCOEo2VmhCYzB0N2xEdnZiZnlyYXVEdVg2N0ctbjBNajlLR01XN2s4SGpmSXFra3BSS2ZGd21leG1FTEptckJJTE9lVVZZbTBfclFqaDU5WW01X2VXSTVB0gHDAUFVX3lxTE9KamRMTnRmb0xCWGlTY2g0aHp1c1VyY3g4SGw0elQ2eDNJTk5pNjdVcWxVaVp5bzZOUjlSM21KYkRYc3gxU1ZoOW50VUhUWE1DR2tCLUtvM01lM3N1YkxXSnI2MWRnVjQzUmNNcjRnTWhkSk9zcDlyQ3UxRVJFRXdRdnRDMHZsTlc4UER0ZXRhbHJxcWxYYlFaaHpCaEZsaWM1bklDNnB2a2xvanRLNUZhQVNLZ1JNMTVYbUlNZWYxUGZPNA?oc=5",
+      "category": "news",
+      "emoji": "📰"
+    },
+    {
+      "id": "https://news.google.com/rss/articles/CBMiugFBVV95cUxORzhHQ1Y3RTNZOWQ2aTR5bllyWEc0WHJDVEs4cWVvcTJWeTZ1TnNJX1BkZGlqMWU4UmdQd002VmhqWG91eTRLeFJDR3BkSjNWUllFSHV5U0x3UEFldW5haTN4T3UyTHozMkk4YUVrZ1h3MU5JNmR0THhYNHZaNDRDT2FMT3JmcTBvV1BGckNtMkxTaGZhcG92NnVaTnpZRjJnYS1YdWNOeDZUWF9kQ2MxWlZTeWVCSmpsSWfSAccBQVVfeXFMUFlIUDI0QnlMNmdMVjcwbVpuYmNGbDNjNW1FYkw0WmRwZ0ZPTjRJYk5JTGhOUklZRTFIeUE4MEdqZUpPdTJQYVVvUFRueXNucVJRM3FsV3VMRU96WUFqS0p5THVxWVhuZF84OF8xa0xRb29hVW90ZVpiQktIdnhDV0pIM3Z5cTRMVDFxRG9UYVRFOXFjYXlUZktoSmJ5NUpvcm9hVDJaek5MQWRjSXg4UDR3REU2aDQ1YS1WYzBaNVMwTlRFV3QzSQ?oc=5",
+      "title": "New study sheds light on indoor, nighttime heat retention in Indian homes",
+      "source": "Down To Earth",
+      "date": "Wed, 13 May 2026 07:00:00 GMT",
+      "summary": "Live update from Down To Earth",
+      "url": "https://news.google.com/rss/articles/CBMiugFBVV95cUxORzhHQ1Y3RTNZOWQ2aTR5bllyWEc0WHJDVEs4cWVvcTJWeTZ1TnNJX1BkZGlqMWU4UmdQd002VmhqWG91eTRLeFJDR3BkSjNWUllFSHV5U0x3UEFldW5haTN4T3UyTHozMkk4YUVrZ1h3MU5JNmR0THhYNHZaNDRDT2FMT3JmcTBvV1BGckNtMkxTaGZhcG92NnVaTnpZRjJnYS1YdWNOeDZUWF9kQ2MxWlZTeWVCSmpsSWfSAccBQVVfeXFMUFlIUDI0QnlMNmdMVjcwbVpuYmNGbDNjNW1FYkw0WmRwZ0ZPTjRJYk5JTGhOUklZRTFIeUE4MEdqZUpPdTJQYVVvUFRueXNucVJRM3FsV3VMRU96WUFqS0p5THVxWVhuZF84OF8xa0xRb29hVW90ZVpiQktIdnhDV0pIM3Z5cTRMVDFxRG9UYVRFOXFjYXlUZktoSmJ5NUpvcm9hVDJaek5MQWRjSXg4UDR3REU2aDQ1YS1WYzBaNVMwTlRFV3QzSQ?oc=5",
+      "category": "news",
+      "emoji": "📰"
+    },
+    {
+      "id": "https://news.google.com/rss/articles/CBMi2wFBVV95cUxNRkVRU0pHYlFqQXY3NW9qR3V4MHVONUZvZDVoemd4OGpSUl9JdW1WY295RVB2M0tHUG5hQWY0X0libzR3S2wyZjZuYmw1Zm9vR09qSzZaMlJCWURhU0dsaXB6TmkxUmV5U2w2Y2F1emFvc09CWW1VQnZBZzduOGZaNEY5WGRMRDRkYUhiSmRZVjYySDNsTDBhRzNGRzJxLVotM1cwa0llVjBEa2dlVHZFN0xLX2FFbjJxTHp2eGZTNjBTSzJXbUhRMWkzdUEzdFlqZmxWWXFka1N4V2_SAeIBQVVfeXFMT3hhYnRKZkVCdzhZS19DbXd5S1V1MUlmY0syXzdvR2REM3hESDV1NVRoVHdwQ3haNTdaWWtUeFVEQzNlaDhwUUFsRnRqRkJoNzhvZ2Zyb2RBSGRTMHB6cWxQZFczalNvZ2NTeUVkbmcyZ0E3ZjVhMU13bjRPbGZMQmJwSkpPX2h6Q0pERV9MMmp0ZjNHQlVxbnI3ZC1GWWFnSXo5Uk1oWjdGVmVhMTNqWkw4bnVNOWJ5WUk0cThaTUVUNkJQT0RtcFdpTjVyRldpM3I3UC1DaWFJNTBfUVZ4YjN6UQ?oc=5",
+      "title": "85% of Chennai residents see climate change as an immediate threat, finds survey",
+      "source": "The Hindu",
+      "date": "Sat, 21 Feb 2026 08:00:00 GMT",
+      "summary": "Live update from The Hindu",
+      "url": "https://news.google.com/rss/articles/CBMi2wFBVV95cUxNRkVRU0pHYlFqQXY3NW9qR3V4MHVONUZvZDVoemd4OGpSUl9JdW1WY295RVB2M0tHUG5hQWY0X0libzR3S2wyZjZuYmw1Zm9vR09qSzZaMlJCWURhU0dsaXB6TmkxUmV5U2w2Y2F1emFvc09CWW1VQnZBZzduOGZaNEY5WGRMRDRkYUhiSmRZVjYySDNsTDBhRzNGRzJxLVotM1cwa0llVjBEa2dlVHZFN0xLX2FFbjJxTHp2eGZTNjBTSzJXbUhRMWkzdUEzdFlqZmxWWXFka1N4V2_SAeIBQVVfeXFMT3hhYnRKZkVCdzhZS19DbXd5S1V1MUlmY0syXzdvR2REM3hESDV1NVRoVHdwQ3haNTdaWWtUeFVEQzNlaDhwUUFsRnRqRkJoNzhvZ2Zyb2RBSGRTMHB6cWxQZFczalNvZ2NTeUVkbmcyZ0E3ZjVhMU13bjRPbGZMQmJwSkpPX2h6Q0pERV9MMmp0ZjNHQlVxbnI3ZC1GWWFnSXo5Uk1oWjdGVmVhMTNqWkw4bnVNOWJ5WUk0cThaTUVUNkJQT0RtcFdpTjVyRldpM3I3UC1DaWFJNTBfUVZ4YjN6UQ?oc=5",
+      "category": "news",
+      "emoji": "📰"
+    },
+    {
+      "id": "https://news.google.com/rss/articles/CBMi7wFBVV95cUxPMERWdnhwTmZsQlZmZUNaVDlZZW9YVGJmR2hzSUxqenlISUFsX1NGbE43TWZaQmxEbHg5dHdLNmJtV3AwQzlxSHU2cVNUaXJGZzBLRWdwQnRFWlpFOEgteHhCQTE5endZRVdwVWxJTDI1UFlUZ2x2ZmY1LTlVUzhjRWMwRFRTNnl0NDZjT00zRnBvV1I2cTVvZ0tkejVFbS1xeFRpZ29tSE1CaEEwTkU3U0dLb3VpS0tFS1hxRERQamxYNXNoZnBYUFQwZVY3b1d6ZVQ1Rndidm5qeXI0bG1sckp1QzhRQTJfYnpyWGxKd9IB9AFBVV95cUxPcUxINXNybkZPQm45NERfQjhwQU1mQ25LcjR3d25adWIydFNRZV92V0hJS2NmQWNMYl9SSHhkVURjelpmTTVub0RwYlV0RXVuVHdkOG1JRkc2RHNrR0gzSHA5d0NOM2k0cE8wMjJuSndoVnE5N1NQODZvZmZ1NWp1dXlhN0ItYmJhMVczRmpJUFVHNUc3NnBweUZieUdCeHJGRXpkYkxpWjdwVlhWakNSTWk4QncyVk01SHB2c0lEbWJqeWZidWlyVDcwcE5OS1lST2EzZ09rWml3WXBMZEx4UWF6bmo3b1dpcS1FVWdRWEc0QWFI?oc=5",
+      "title": "Hill Station Heatwave: Ooty, Yercaud Temperatures Rise Amidst Climate Change Concerns",
+      "source": "The Times of India",
+      "date": "Tue, 26 May 2026 07:00:00 GMT",
+      "summary": "Live update from The Times of India",
+      "url": "https://news.google.com/rss/articles/CBMi7wFBVV95cUxPMERWdnhwTmZsQlZmZUNaVDlZZW9YVGJmR2hzSUxqenlISUFsX1NGbE43TWZaQmxEbHg5dHdLNmJtV3AwQzlxSHU2cVNUaXJGZzBLRWdwQnRFWlpFOEgteHhCQTE5endZRVdwVWxJTDI1UFlUZ2x2ZmY1LTlVUzhjRWMwRFRTNnl0NDZjT00zRnBvV1I2cTVvZ0tkejVFbS1xeFRpZ29tSE1CaEEwTkU3U0dLb3VpS0tFS1hxRERQamxYNXNoZnBYUFQwZVY3b1d6ZVQ1Rndidm5qeXI0bG1sckp1QzhRQTJfYnpyWGxKd9IB9AFBVV95cUxPcUxINXNybkZPQm45NERfQjhwQU1mQ25LcjR3d25adWIydFNRZV92V0hJS2NmQWNMYl9SSHhkVURjelpmTTVub0RwYlV0RXVuVHdkOG1JRkc2RHNrR0gzSHA5d0NOM2k0cE8wMjJuSndoVnE5N1NQODZvZmZ1NWp1dXlhN0ItYmJhMVczRmpJUFVHNUc3NnBweUZieUdCeHJGRXpkYkxpWjdwVlhWakNSTWk4QncyVk01SHB2c0lEbWJqeWZidWlyVDcwcE5OS1lST2EzZ09rWml3WXBMZEx4UWF6bmo3b1dpcS1FVWdRWEc0QWFI?oc=5",
+      "category": "news",
+      "emoji": "📰"
+    },
+    {
+      "id": "https://news.google.com/rss/articles/CBMitgFBVV95cUxNSXhvTVhoRVJkWFhoQTdVRHZFelFaUWVOZmM4ZEYxbjVyTHdtQlZ3cDd0NGlRcTV6RTRvLUtvelBISHFkT2N0ZTlkekNUX216bnczN0JQcy1XOG1KTUxQdTNVdWNhaGZTb3NOSHVCbTZvMkg3RnFIQXpBRXZzMWlIenhsTTNUWEFDQ2lKSWZzY3ltNWNkNzhSbUVqR1J4eEpfdUt2WUVlbl90OFM3YnZHeUpwQjl1Zw?oc=5",
+      "title": "Why is Chennai like Ooty these days? Scientist S Balachandran explains",
+      "source": "The Federal",
+      "date": "Mon, 26 Jan 2026 08:00:00 GMT",
+      "summary": "Live update from The Federal",
+      "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxNSXhvTVhoRVJkWFhoQTdVRHZFelFaUWVOZmM4ZEYxbjVyTHdtQlZ3cDd0NGlRcTV6RTRvLUtvelBISHFkT2N0ZTlkekNUX216bnczN0JQcy1XOG1KTUxQdTNVdWNhaGZTb3NOSHVCbTZvMkg3RnFIQXpBRXZzMWlIenhsTTNUWEFDQ2lKSWZzY3ltNWNkNzhSbUVqR1J4eEpfdUt2WUVlbl90OFM3YnZHeUpwQjl1Zw?oc=5",
+      "category": "news",
+      "emoji": "📰"
     }
-  ]
+  ],
+  "last_updated": "2026-06-22T04:50:44.023233"
 }
