@@ -1100,6 +1100,15 @@
       document.getElementById("res-food").textContent = totalFood.toFixed(1);
       
       document.getElementById("res-elec").textContent = data.breakdown.electricity.toFixed(1);
+      const gridSourceEl = document.getElementById("res-elec-source");
+      if (gridSourceEl) {
+        gridSourceEl.textContent = data.grid_source || "";
+        if (data.grid_source && (data.grid_source.includes("Fallback") || data.grid_source.includes("Error"))) {
+          gridSourceEl.style.color = "#f97316"; // Alert/warning orange color
+        } else {
+          gridSourceEl.style.color = "var(--text-dim)";
+        }
+      }
       
       // Update calories
       const calBox = document.getElementById("res-calories-box");

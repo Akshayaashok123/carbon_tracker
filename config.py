@@ -32,6 +32,7 @@ class Config:
     OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434/api/generate")
     OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "llama3.2:1b")
     CALORIENINJAS_API_KEY = os.environ.get("CALORIENINJAS_API_KEY", "")
+    ELECTRICITY_MAPS_API_KEY = os.environ.get("ELECTRICITY_MAPS_API_KEY", "")
 
     # ── Strava ────────────────────────────────────────────────
     STRAVA_CLIENT_ID = os.environ.get("STRAVA_CLIENT_ID", "")

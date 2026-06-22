@@ -73,6 +73,7 @@ STRAVA_CLIENT_ID = Config.STRAVA_CLIENT_ID
 STRAVA_CLIENT_SECRET = Config.STRAVA_CLIENT_SECRET
 STRAVA_REDIRECT_URI = Config.STRAVA_REDIRECT_URI
 CALORIENINJAS_API_KEY = Config.CALORIENINJAS_API_KEY
+ELECTRICITY_MAPS_API_KEY = Config.ELECTRICITY_MAPS_API_KEY
 
 TRANSPORT_MODES = {
     'car_solo':   ('driving', 0.171, '🚗 Car (Solo)'),
@@ -347,6 +348,27 @@ def autocomplete():
 
 # ── Carbon Calculation ────────────────────────────────────────
 
+def get_grid_carbon_intensity(lat, lon):
+    if not ELECTRICITY_MAPS_API_KEY:
+        return 0.3, "Fallback (0.3 kg/kWh) - Key missing"
+
+    try:
+        url = f"https://api.electricitymaps.com/v3/carbon-intensity/latest?lat={lat}&lon={lon}"
+        res = requests.get(url, headers={"auth-token": ELECTRICITY_MAPS_API_KEY}, timeout=5)
+        res.raise_for_status()
+        intensity_data = res.json()
+        carbon_intensity = intensity_data.get("carbonIntensity")
+        if carbon_intensity is not None:
+            factor = round(carbon_intensity / 1000.0, 3)
+            factor = max(0.05, min(1.5, factor))
+            return factor, "Electricity Maps API"
+        else:
+            raise ValueError("carbonIntensity key missing in API response")
+    except Exception as e:
+        logger.warning("Electricity Maps API failed, falling back to 0.3 kg CO2/kWh: %s", e)
+        return 0.3, f"Fallback (0.3 kg/kWh) - Error: {type(e).__name__}"
+
+
 @app.route('/api/calculate', methods=['POST'])
 def calculate_carbon():
     try:
@@ -361,10 +383,17 @@ def calculate_carbon():
             transport_key, TRANSPORT_MODES['car_solo']
         )
 
+        d_lat, d_lon = None, None
         if manual_dist is not None:
             dist_km = float(manual_dist)
             commute_co2 = round(dist_km * co2_per_km, 2)
             fastest = cheapest = greenest = None
+            
+            d_lat = data.get('dest_lat') or data.get('origin_lat')
+            d_lon = data.get('dest_lon') or data.get('origin_lon')
+            if not d_lat or not d_lon:
+                # Fallback to Chennai coordinates if manual entry doesn't supply them
+                d_lat, d_lon = 13.0827, 80.2707
         else:
             o_lat, o_lon = data.get('origin_lat'), data.get('origin_lon')
             d_lat, d_lon = data.get('dest_lat'), data.get('dest_lon')
@@ -390,7 +419,9 @@ def calculate_carbon():
             dist_km = selected_route['dist'] if selected_route else 0
             commute_co2 = selected_route['co2'] if selected_route else 0
 
-        elec_co2 = elec_hours * 0.3
+        # Calculate grid intensity dynamically based on location
+        grid_factor, grid_source = get_grid_carbon_intensity(d_lat, d_lon)
+        elec_co2 = elec_hours * grid_factor
         smart_food_impact = float(data.get('smart_food_co2', 0))
         total = commute_co2 + food_impact + elec_co2 + smart_food_impact
 
@@ -423,7 +454,9 @@ def calculate_carbon():
                 'trees_needed':  max(1, round(total / 21)),
                 'phone_charges': round(total * 83333, 0)
             },
-            'equivalents': equivalents
+            'equivalents': equivalents,
+            'grid_factor': grid_factor,
+            'grid_source': grid_source
         })
     except Exception as e:
         logger.exception("calculate_carbon failed")
