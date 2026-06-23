@@ -59,6 +59,16 @@
   ],
   "news": [
     {
+      "id": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxNa1ZjNHlxWUZfZkRHQXUxUFUwVk56VlBHQWtxazNMOWtfbml0ZGJVVE95ZVlwMVRsalVGSF96UGJRMmVuUTFGamR2YkQtQUNSZVMta3F1Z3FJZllwTF9uSlV5YXozVFhQN2E4MnRfVDNhMVZrTW56eEY0Wkh0Mk9QUFZreVZkUzY1M0hkVUpCNF9ZRHJsalVRNHA5UDRUTnFRUDNkeGRGZnVjTlJaLXo5RzFYWF9ldUo5aERj?oc=5",
+      "title": "Tamil Nadu plants 20,000 mangroves along Buckingham canal to boost Chennai’s climate resilience",
+      "source": "DD News",
+      "date": "Mon, 22 Jun 2026 07:30:43 GMT",
+      "summary": "Live update from DD News",
+      "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxNa1ZjNHlxWUZfZkRHQXUxUFUwVk56VlBHQWtxazNMOWtfbml0ZGJVVE95ZVlwMVRsalVGSF96UGJRMmVuUTFGamR2YkQtQUNSZVMta3F1Z3FJZllwTF9uSlV5YXozVFhQN2E4MnRfVDNhMVZrTW56eEY0Wkh0Mk9QUFZreVZkUzY1M0hkVUpCNF9ZRHJsalVRNHA5UDRUTnFRUDNkeGRGZnVjTlJaLXo5RzFYWF9ldUo5aERj?oc=5",
+      "category": "news",
+      "emoji": "📰"
+    },
+    {
       "id": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxNM25rN0ZlRUVRSmVRblV1ZjdUZXVfcjJFanMxVldxYzl1RmJvQzlFekZ0QUNCdWs5OGlTZ3ZRQjRyLURXeXhyRnBzQkVLREVralB6QWliQjBwRjJ2aGUtSmJ6X3lrM1Z5ZjV2NGVxUGNja1RNVUpxTGk4MkctY0J0Q0R3WDN2b0lCcC1MbU1LUVBQcHozeU0tRmlJVTFxS0NwWDViX0hjOXJPYkVUMjR0Nk1rZXhyU2FXZGtZSTlycnpaemt3SXZlV1BhRG1EVU5uQk1WYtIB4gFBVV95cUxNVHpwdzA2S2p0OTZxenZFQWc3LWJwLXlIU01MNHdvRXZITDdpRGVwT3FEdkx2YV9oM19taEJWUklyaWY1TTJHQ1U3ZXVhNWpwTFRXYzB2MHpwWTVvQ2xCbXJpM0d1dTY4UDNsMnM0WUpNcXNEUlJVM2N2Y3dnUi1xRVlyZUYtNWxmZU5MWkZBUEU1bTNyMU9Gc05wRUxfclljclVqSGd5T3NOUVpWVmtfam1Lcm1jSHh1MkI2dTlnb0Etd1pyS0luRi1JOEZMM2Q2b29pUjRwRWN5VmM5Y1Z4U3dR?oc=5",
       "title": "‘Cool roofs not enough, formulate heat-safety guideline for schools’: Activists",
       "source": "The New Indian Express",
@@ -75,16 +85,6 @@
       "date": "Fri, 05 Jun 2026 07:00:00 GMT",
       "summary": "Live update from The Hindu",
       "url": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxQSG9pd011blhFV1NOWUl5bkpVc3MzdGk5N1dTLW9BbjVNSHRZUDFkdzF1Y2JUcU04NVY2YkNBMGIwV1h1MEdRNkZSXzRBdmZtdzM5NlBoaE01aGVTek9CNWlUTnNSc0Qyb0JGRzhMNkZiYkFXeS1vRUhzVXI3ZWFzc0I2WW9lN0tfQUV3X1JObXNWZGhCaDA4SFBlNVZySGgyZmtidzNVZEhnelU0UjVkdm9SRVRmeTZ4SjV6T2FzaE93SzBCa3g5aWp5aUQtRFpaYl9sZNIB2wFBVV95cUxOZnljQTQwRWl3STVTMWpUTnVmQnFMckJzWmJtYlJKUlB0TTJBUjdNOS12YTR5RkU2VFBWTG1YV3N1NUZieXIzalgyUUpZZDNpZldHU3JlX3dmT0Y4ZUdwNFB2NzhIblNyMl85QmF6a1FyX2VfMVRJNDU1VlQyMEc3ZzAyRkpJaDMyenExcm05dDlVMTk5a2xQOXZDWmpMWjlkZEhaSkVSQ1BubEJsdUxvVDVsUHlQRzgxWW5UcTMwTkRnNWpSSEI2QVRYX1VtQmhrd3VucmlQSmtxX2c?oc=5",
-      "category": "news",
-      "emoji": "📰"
-    },
-    {
-      "id": "https://news.google.com/rss/articles/CBMioAFBVV95cUxPZVBxbnpSN08tdU15czBObUhFTHRpakxxY1FSZzBBR01rTkFPeTMxeklyeVBPR0Y5eW5VZzFuSG1SNkZQbTljMXFLOWZJb01ZODRpN216SjE2TVJmVDVoVENYV2dsVGIwV3FzQXBlQm9JUkMtbENFLU0yN3pDenFDLW54OTZwcFNHcGNPY0lVSlU2M3M1UVhqUEtuMFQ1dWJa0gGuAUFVX3lxTE9DOWJmUEk3RWdhOVNLWEphYldjTTJ4anRhQTFxYkNFNy13bGdKbDVRRVduTzYwOTB5cTB2RGtTLUFrLWZMZWd1bm1waEdzanl4MWR2Q2RvZ0tGbTVNZlFVVkxUMWJ1NmttWUtIb1Z2SDJPMGJWNXhfakhaWHJvTmhjcHBHMEstbzR5WkFIY0dGZ2p0UFZocHlPTzlsYW1laExveUVPQ0h0M3lyeE5tQQ?oc=5",
-      "title": "Chennai Corporation expands cool roof initiative to 55 schools",
-      "source": "DT Next",
-      "date": "Sat, 20 Jun 2026 13:54:35 GMT",
-      "summary": "Live update from DT Next",
-      "url": "https://news.google.com/rss/articles/CBMioAFBVV95cUxPZVBxbnpSN08tdU15czBObUhFTHRpakxxY1FSZzBBR01rTkFPeTMxeklyeVBPR0Y5eW5VZzFuSG1SNkZQbTljMXFLOWZJb01ZODRpN216SjE2TVJmVDVoVENYV2dsVGIwV3FzQXBlQm9JUkMtbENFLU0yN3pDenFDLW54OTZwcFNHcGNPY0lVSlU2M3M1UVhqUEtuMFQ1dWJa0gGuAUFVX3lxTE9DOWJmUEk3RWdhOVNLWEphYldjTTJ4anRhQTFxYkNFNy13bGdKbDVRRVduTzYwOTB5cTB2RGtTLUFrLWZMZWd1bm1waEdzanl4MWR2Q2RvZ0tGbTVNZlFVVkxUMWJ1NmttWUtIb1Z2SDJPMGJWNXhfakhaWHJvTmhjcHBHMEstbzR5WkFIY0dGZ2p0UFZocHlPTzlsYW1laExveUVPQ0h0M3lyeE5tQQ?oc=5",
       "category": "news",
       "emoji": "📰"
     },
@@ -119,16 +119,6 @@
       "emoji": "📰"
     },
     {
-      "id": "https://news.google.com/rss/articles/CBMi7wFBVV95cUxPMERWdnhwTmZsQlZmZUNaVDlZZW9YVGJmR2hzSUxqenlISUFsX1NGbE43TWZaQmxEbHg5dHdLNmJtV3AwQzlxSHU2cVNUaXJGZzBLRWdwQnRFWlpFOEgteHhCQTE5endZRVdwVWxJTDI1UFlUZ2x2ZmY1LTlVUzhjRWMwRFRTNnl0NDZjT00zRnBvV1I2cTVvZ0tkejVFbS1xeFRpZ29tSE1CaEEwTkU3U0dLb3VpS0tFS1hxRERQamxYNXNoZnBYUFQwZVY3b1d6ZVQ1Rndidm5qeXI0bG1sckp1QzhRQTJfYnpyWGxKd9IB9AFBVV95cUxPcUxINXNybkZPQm45NERfQjhwQU1mQ25LcjR3d25adWIydFNRZV92V0hJS2NmQWNMYl9SSHhkVURjelpmTTVub0RwYlV0RXVuVHdkOG1JRkc2RHNrR0gzSHA5d0NOM2k0cE8wMjJuSndoVnE5N1NQODZvZmZ1NWp1dXlhN0ItYmJhMVczRmpJUFVHNUc3NnBweUZieUdCeHJGRXpkYkxpWjdwVlhWakNSTWk4QncyVk01SHB2c0lEbWJqeWZidWlyVDcwcE5OS1lST2EzZ09rWml3WXBMZEx4UWF6bmo3b1dpcS1FVWdRWEc0QWFI?oc=5",
-      "title": "Hill Station Heatwave: Ooty, Yercaud Temperatures Rise Amidst Climate Change Concerns",
-      "source": "The Times of India",
-      "date": "Tue, 26 May 2026 07:00:00 GMT",
-      "summary": "Live update from The Times of India",
-      "url": "https://news.google.com/rss/articles/CBMi7wFBVV95cUxPMERWdnhwTmZsQlZmZUNaVDlZZW9YVGJmR2hzSUxqenlISUFsX1NGbE43TWZaQmxEbHg5dHdLNmJtV3AwQzlxSHU2cVNUaXJGZzBLRWdwQnRFWlpFOEgteHhCQTE5endZRVdwVWxJTDI1UFlUZ2x2ZmY1LTlVUzhjRWMwRFRTNnl0NDZjT00zRnBvV1I2cTVvZ0tkejVFbS1xeFRpZ29tSE1CaEEwTkU3U0dLb3VpS0tFS1hxRERQamxYNXNoZnBYUFQwZVY3b1d6ZVQ1Rndidm5qeXI0bG1sckp1QzhRQTJfYnpyWGxKd9IB9AFBVV95cUxPcUxINXNybkZPQm45NERfQjhwQU1mQ25LcjR3d25adWIydFNRZV92V0hJS2NmQWNMYl9SSHhkVURjelpmTTVub0RwYlV0RXVuVHdkOG1JRkc2RHNrR0gzSHA5d0NOM2k0cE8wMjJuSndoVnE5N1NQODZvZmZ1NWp1dXlhN0ItYmJhMVczRmpJUFVHNUc3NnBweUZieUdCeHJGRXpkYkxpWjdwVlhWakNSTWk4QncyVk01SHB2c0lEbWJqeWZidWlyVDcwcE5OS1lST2EzZ09rWml3WXBMZEx4UWF6bmo3b1dpcS1FVWdRWEc0QWFI?oc=5",
-      "category": "news",
-      "emoji": "📰"
-    },
-    {
       "id": "https://news.google.com/rss/articles/CBMitgFBVV95cUxNSXhvTVhoRVJkWFhoQTdVRHZFelFaUWVOZmM4ZEYxbjVyTHdtQlZ3cDd0NGlRcTV6RTRvLUtvelBISHFkT2N0ZTlkekNUX216bnczN0JQcy1XOG1KTUxQdTNVdWNhaGZTb3NOSHVCbTZvMkg3RnFIQXpBRXZzMWlIenhsTTNUWEFDQ2lKSWZzY3ltNWNkNzhSbUVqR1J4eEpfdUt2WUVlbl90OFM3YnZHeUpwQjl1Zw?oc=5",
       "title": "Why is Chennai like Ooty these days? Scientist S Balachandran explains",
       "source": "The Federal",
@@ -137,7 +127,17 @@
       "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxNSXhvTVhoRVJkWFhoQTdVRHZFelFaUWVOZmM4ZEYxbjVyTHdtQlZ3cDd0NGlRcTV6RTRvLUtvelBISHFkT2N0ZTlkekNUX216bnczN0JQcy1XOG1KTUxQdTNVdWNhaGZTb3NOSHVCbTZvMkg3RnFIQXpBRXZzMWlIenhsTTNUWEFDQ2lKSWZzY3ltNWNkNzhSbUVqR1J4eEpfdUt2WUVlbl90OFM3YnZHeUpwQjl1Zw?oc=5",
       "category": "news",
       "emoji": "📰"
+    },
+    {
+      "id": "https://news.google.com/rss/articles/CBMixAFBVV95cUxQTXBFRHNRdmdIN3FHMHNua204UXZROWJIYWRmNG9QaFJpdW9YQkptNXBPY2gxUWtHWTNfV1drcFdsT2lNTEoyM2hmTmlwLUhvNk5Ub2dhZ2xpcDc3VFJnVDlZYV9aTDlOM0dmbjhpN3ZLX2FURm9BTlREYll5YnRzYXBsNHFfRGN1Wl9fd3F4S2xCUFQ5ZHdGcG94N2l3cXI0NUNJMzVOOEJ1cnMycFJnMlMyR25UU1FmVTVWYkd6Qm1UTW5W0gHKAUFVX3lxTE54cnRheG40aXFRd2MzU0RKVDYtajFfaTJzUlFueTFLamJFSFBMc1N5cElvSHB4NGJ0d2xTOWhGMmRid2Q5emdaclJ0SmV0bERpU2dZVUhub2tLSU1ZRlZqbFQ4TVdrX25Kc0JyYm13TlVmZ2s4RDV1cmVIZG5yWmZDeHNYYlBMMkY0RENJOGRCVDZ4aFE4QktRMTNiTDhSU1A4bE5XQmg5VUpKMUROaHZNdTlEVjh2dzcwVjVmYmcwNFc2SXd2b193bWc?oc=5",
+      "title": "February Fog: Climate Change Rewriting City’s Weather Profile?",
+      "source": "Deccan Chronicle",
+      "date": "Tue, 10 Feb 2026 08:00:00 GMT",
+      "summary": "Live update from Deccan Chronicle",
+      "url": "https://news.google.com/rss/articles/CBMixAFBVV95cUxQTXBFRHNRdmdIN3FHMHNua204UXZROWJIYWRmNG9QaFJpdW9YQkptNXBPY2gxUWtHWTNfV1drcFdsT2lNTEoyM2hmTmlwLUhvNk5Ub2dhZ2xpcDc3VFJnVDlZYV9aTDlOM0dmbjhpN3ZLX2FURm9BTlREYll5YnRzYXBsNHFfRGN1Wl9fd3F4S2xCUFQ5ZHdGcG94N2l3cXI0NUNJMzVOOEJ1cnMycFJnMlMyR25UU1FmVTVWYkd6Qm1UTW5W0gHKAUFVX3lxTE54cnRheG40aXFRd2MzU0RKVDYtajFfaTJzUlFueTFLamJFSFBMc1N5cElvSHB4NGJ0d2xTOWhGMmRid2Q5emdaclJ0SmV0bERpU2dZVUhub2tLSU1ZRlZqbFQ4TVdrX25Kc0JyYm13TlVmZ2s4RDV1cmVIZG5yWmZDeHNYYlBMMkY0RENJOGRCVDZ4aFE4QktRMTNiTDhSU1A4bE5XQmg5VUpKMUROaHZNdTlEVjh2dzcwVjVmYmcwNFc2SXd2b193bWc?oc=5",
+      "category": "news",
+      "emoji": "📰"
     }
   ],
-  "last_updated": "2026-06-22T05:50:59.323431"
+  "last_updated": "2026-06-23T04:59:42.617212"
 }

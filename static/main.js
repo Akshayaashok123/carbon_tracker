@@ -43,9 +43,28 @@
 
   // ── SOUND ──────────────────────────────────────────────
   let _audioCtx = null;
+  let _userHasInteracted = false;
+
+  // Track the first user gesture so we can safely create AudioContext
+  function _markInteraction() {
+    _userHasInteracted = true;
+    if (_audioCtx && _audioCtx.state === 'suspended') {
+      _audioCtx.resume();
+    }
+  }
+  document.addEventListener('click', _markInteraction, { once: true, passive: true });
+  document.addEventListener('keydown', _markInteraction, { once: true, passive: true });
+  document.addEventListener('touchstart', _markInteraction, { once: true, passive: true });
+
   function playTone(f, d, t="sine", v=0.1) {
+    if (!_userHasInteracted) return; // silence until the user has interacted
     try {
-      if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (!_audioCtx) {
+        _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (_audioCtx.state === 'suspended') {
+        _audioCtx.resume();
+      }
       const osc = _audioCtx.createOscillator();
       const gain = _audioCtx.createGain();
       osc.connect(gain); gain.connect(_audioCtx.destination);
@@ -61,6 +80,7 @@
     win:   () => [660, 880, 1100].forEach((f, i) => setTimeout(() => playTone(f, 0.2), i * 150)),
     pop:   () => playTone(600, 0.08, "sine", 0.05)
   };
+
 
   // ── UI ENGINE ──────────────────────────────────────────
   window.showScreen = function (screenId) {
@@ -113,6 +133,7 @@
     if (screenId === "screen-badges") loadBadges();
     if (screenId === "screen-ecohub") loadEcoHub();
     if (screenId === "screen-activity") loadActivity();
+    if (screenId === "screen-green-wallet") loadWallet();
     
     // ... existing logic ...
     
@@ -230,6 +251,44 @@
       console.error(err);
       const feed = document.getElementById("activity-feed");
       if (feed) feed.innerHTML = "<p style='color:#f87171'>Could not load activity data.</p>";
+    }
+  }
+
+  // ── WALLET ────────────────────────────────────────────
+  async function loadWallet() {
+    const user = SESSION.username || localStorage.getItem("eco_user");
+    if (!user) return;
+    try {
+      const res = await fetch('/api/wallet');
+      if (!res.ok) throw new Error('Wallet API error');
+      const data = await res.json();
+      const container = document.getElementById('wallet-content');
+      if (!container) return;
+      const { balance, level, level_title, level_progress, level_threshold, transactions } = data;
+      const progressPct = Math.min(100, (level_progress / level_threshold) * 100);
+      const html = `
+        <div class="wallet-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+          <div><h2 style="margin:0; font-size:1.4rem;">💚 Balance: ${balance} pts</h2></div>
+          <div><span style="font-weight:600;">Level ${level}: ${level_title}</span></div>
+        </div>
+        <div class="wallet-progress" style="background:rgba(255,255,255,0.05); border-radius:10px; overflow:hidden; height:12px; margin-bottom:30px;">
+          <div style="width:${progressPct}%; background:var(--primary); height:100%;"></div>
+        </div>
+        <h3 style="font-size:1rem; margin-bottom:10px;">Recent Transactions</h3>
+        <ul style="list-style:none; padding:0; margin:0;">
+          ${transactions.slice(0,5).map(t => `
+            <li style="padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.05); display:flex; justify-content:space-between; align-items:center;">
+              <span>${escapeHTML(t.action)} ${t.amount > 0 ? '+' : ''}${t.amount} pts</span>
+              <span style="color:var(--text-dim); font-size:0.85rem;">${new Date(t.timestamp).toLocaleDateString()}</span>
+            </li>
+          `).join('')}
+        </ul>
+      `;
+      container.innerHTML = html;
+    } catch (err) {
+      console.error('Wallet load error:', err);
+      const container = document.getElementById('wallet-content');
+      if (container) container.innerHTML = "<p style='color:#f87171'>Failed to load wallet.</p>";
     }
   }
 

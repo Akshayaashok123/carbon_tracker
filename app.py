@@ -329,89 +329,60 @@ def health_check():
         return jsonify({"status": "unhealthy", "database": str(e)}), 500
 
 @app.route('/api/wallet', methods=['GET', 'POST'])
+@login_required
+
 def wallet_api():
     """Handle wallet data.
 
     GET  – returns the current wallet info (browser‑friendly).
     POST – accepts JSON payload to update/redeem coins.
     """
-    if request.method == "GET":
-        user = get_acting_user()
-        if not user:
-            return jsonify({'error': 'Unauthorized'}), 401
-
-        lvl, title, prog, thresh = user.get_level_info()
-        recent_logs = (
-            DailyLog.query.filter_by(user_id=user.id)
-            .order_by(DailyLog.date.desc())
-            .limit(10)
-            .all()
-        )
-        transactions = [
-            {
-                'date': log.date.isoformat(),
-                'total': round(log.total, 2),
-                'transport': log.transport,
-                'calories': log.calories,
-            }
-            for log in recent_logs
-        ]
-
-        return jsonify(
-            {
-                'balance': user.points,
-                'level': lvl,
-                'level_title': title,
-                'progress': prog,
-                'threshold': thresh,
-                'transactions': transactions,
-            }
-        )
-
-
-    # POST handling
-    if not request.is_json:
-        return jsonify({'error': 'Content-Type must be application/json'}), 400
-
-    data = request.get_json()
-    # Expected keys: action (add_points or redeem_points), amount (positive integer)
-    action = data.get('action')
-    amount = data.get('amount', 0)
-
-    if action not in ('add_points', 'redeem_points'):
-        return jsonify({'error': 'Invalid action'}), 400
-    if not isinstance(amount, int) or amount <= 0:
-        return jsonify({'error': 'Amount must be a positive integer'}), 400
-
     user = get_acting_user()
     if not user:
         return jsonify({'error': 'Unauthorized'}), 401
 
-    try:
-        if action == 'add_points':
-            user.points += amount
-        else:  # redeem_points
-            if user.points < amount:
-                return jsonify({'error': 'Insufficient points'}), 400
-            user.points -= amount
+    if request.method == "POST":
+        if not request.is_json:
+            return jsonify({'error': 'Content-Type must be application/json'}), 400
 
-        # Record a simple wallet transaction using DailyLog as a placeholder
-        from datetime import datetime
-        log = DailyLog(
-            user_id=user.id,
-            date=datetime.utcnow().date(),
-            total=user.points,  # snapshot of current balance
-            transport='wallet_update',
-            calories=0,
-        )
-        db.session.add(log)
-        db.session.commit()
-    except Exception as e:
-        db.session.rollback()
-        logger.exception('Wallet update failed')
-        return jsonify({'error': 'Internal server error'}), 500
+        data = request.get_json()
+        action = data.get('action')
+        amount = data.get('amount', 0)
 
-    # Return refreshed wallet data (reuse GET logic for consistency)
+        if action not in ('add_points', 'redeem_points'):
+            return jsonify({'error': 'Invalid action'}), 400
+        if not isinstance(amount, int) or amount <= 0:
+            return jsonify({'error': 'Amount must be a positive integer'}), 400
+
+        try:
+            if action == 'add_points':
+                user.points += amount
+                calories_val = amount
+                transport_val = 'wallet_add'
+            else:  # redeem_points
+                if user.points < amount:
+                    return jsonify({'error': 'Insufficient points'}), 400
+                user.points -= amount
+                calories_val = -amount
+                transport_val = 'wallet_redeem'
+
+            # Record a simple wallet transaction using DailyLog as a placeholder
+            from datetime import datetime
+            log = DailyLog(
+                user_id=user.id,
+                date=datetime.utcnow().date(),
+                total=user.points,  # snapshot of current balance
+                transport=transport_val,
+                calories=calories_val,
+            )
+            db.session.add(log)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            logger.exception('Wallet update failed')
+            return jsonify({'error': 'Internal server error'}), 500
+
+    # Common GET & POST return logic
     lvl, title, prog, thresh = user.get_level_info()
     recent_logs = (
         DailyLog.query.filter_by(user_id=user.id)
@@ -419,24 +390,55 @@ def wallet_api():
         .limit(10)
         .all()
     )
-    transactions = [
-        {
-            'date': log.date.isoformat(),
-            'total': round(log.total, 2),
-            'transport': log.transport,
-            'calories': log.calories,
-        }
-        for log in recent_logs
-    ]
-    return jsonify({
+
+    transactions = []
+    for log in recent_logs:
+        if log.transport in ('wallet_update', 'wallet_add', 'wallet_redeem'):
+            if log.transport == 'wallet_add':
+                action_desc = "Added Points"
+                amount_val = log.calories
+            elif log.transport == 'wallet_redeem':
+                action_desc = "Redeemed Points"
+                amount_val = log.calories
+            else:
+                action_desc = "Points Adjustment"
+                amount_val = log.calories if log.calories != 0 else 0
+        else:
+            # Commute activity
+            pts = 100
+            if log.total <= GREEN_DAY_LIMIT:
+                pts += 50
+            if log.transport != 'car_solo':
+                pts += 100
+
+            mode_map = {
+                'walk': 'Commuted by Walking',
+                'bicycle': 'Commuted by Bicycle',
+                'bus': 'Commuted by Bus',
+                'metro': 'Commuted by Metro',
+                'car_solo': 'Commuted by Car (Solo)',
+            }
+            action_desc = mode_map.get(log.transport, f"Logged Activity ({log.transport})")
+            amount_val = pts
+
+        transactions.append({
+            'action': action_desc,
+            'amount': amount_val,
+            'timestamp': log.date.isoformat(),
+        })
+
+    resp = {
         'balance': user.points,
         'level': lvl,
         'level_title': title,
-        'progress': prog,
-        'threshold': thresh,
+        'level_progress': prog,
+        'level_threshold': thresh,
         'transactions': transactions,
-        'success': True,
-    })
+    }
+    if request.method == "POST":
+        resp['success'] = True
+
+    return jsonify(resp)
 
 
 # Deprecated: route registration moved to @app.route decorator

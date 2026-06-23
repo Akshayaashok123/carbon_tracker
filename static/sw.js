@@ -2,12 +2,13 @@
  * EcoTracker Service Worker — PWA offline support.
  *
  * Strategy:
- *  - Static assets (CSS, JS, images) → Cache-first (fast loads)
+ *  - JS files → Network-first (ensures code updates always load)
+ *  - Static assets (CSS, images) → Cache-first (fast loads)
  *  - API calls → Network-first (always fresh data, cached fallback)
  *  - HTML pages → Network-first with offline fallback
  */
 
-const CACHE_NAME = "ecotracker-v2";
+const CACHE_NAME = "ecotracker-v3";
 const STATIC_ASSETS = [
   "/",
   "/static/css/style.css",
@@ -40,7 +41,7 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
-// ── Fetch: network-first for API, cache-first for static ─────
+// ── Fetch: network-first for API + JS, cache-first for other static ─────
 self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
 
@@ -63,7 +64,21 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Static assets — cache first, fall back to network
+  // JavaScript files — ALWAYS network-first so code changes load immediately
+  if (url.pathname.endsWith(".js")) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          return response;
+        })
+        .catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  // Other static assets (CSS, images) — cache first, fall back to network
   if (url.pathname.startsWith("/static/")) {
     event.respondWith(
       caches.match(event.request).then((cached) => {
