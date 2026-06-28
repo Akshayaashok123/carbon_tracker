@@ -16,8 +16,9 @@
 <meta name="mobile-web-app-capable" content="yes">
 
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="stylesheet" href="/static/css/style.css?v=3.0">
+<link rel="stylesheet" href="/static/css/style.css?v=4.0">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="/static/socket.io.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
@@ -60,9 +61,9 @@
           <h2 style="font-size: 1.6rem; margin-bottom: 28px; font-weight:800;">Get Started</h2>
 
           <!-- Department selection (used before OAuth redirect) -->
-          <div class="fg" style="margin-bottom: 20px;">
-            <label for="loginDept" style="color: var(--text-dim); font-size: 0.8rem; font-weight: 700;">Your Department</label>
-            <select id="loginDept" aria-label="Select your department">
+          <div class="fg">
+            <label for="loginDept">Your Department</label>
+            <select id="loginDept" name="loginDept">
               <option value="Computer Science">Computer Science</option>
               <option value="Engineering">Engineering</option>
               <option value="Arts">Arts &amp; Design</option>
@@ -71,7 +72,7 @@
           </div>
 
           <!-- Primary: Google OAuth Login -->
-          <button class="btn-google" id="googleLoginBtn" onclick="loginWithGoogle()" style="margin-top:8px; width:100%; padding:18px; border-radius:16px; font-size:1rem; font-weight:800; display:flex; align-items:center; justify-content:center; gap:12px; background:white; color:#333; border:1px solid rgba(0,0,0,0.1); cursor:pointer; transition: all 0.2s;">
+          <button class="btn-google" id="googleLoginBtn" onclick="loginWithGoogle()" aria-label="Sign in with your Google Account">
             <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
             Sign in with Google
           </button>
@@ -80,10 +81,11 @@
           <div id="dev-login-section" style="display:none; margin-top:20px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.06);">
             <p style="color:var(--text-dim); font-size:0.7rem; text-transform:uppercase; font-weight:800; letter-spacing:0.1em; margin-bottom:12px;">Dev Mode Login</p>
             <div class="fg">
-              <label for="loginName" style="color: var(--text-dim); font-size: 0.8rem; font-weight: 700;">Full Name</label>
-              <input type="text" id="loginName" placeholder="Enter your name" aria-label="Your full name">
+              <label for="loginName">Full Name</label>
+              <input type="text" id="loginName" placeholder="Enter your name" aria-required="true">
+              <span id="loginName-error" class="error-message" style="display: none;" aria-live="polite"></span>
             </div>
-            <button class="btn-primary" onclick="startApp()" style="margin-top:16px;">Start Your Journey →</button>
+            <button class="btn-primary" onclick="startApp()" style="margin-top: var(--space-md);" aria-label="Start application in developer mode">Start Your Journey →</button>
           </div>
         </div>
 
@@ -111,14 +113,15 @@
 
           <!-- Privacy / Data controls -->
           <div style="display:flex; gap:10px; justify-content:center; margin-bottom:10px;">
-            <button onclick="exportMyData()" style="background:none; border:1px solid rgba(255,255,255,0.1); color:var(--text-dim); padding:8px 16px; border-radius:10px; font-size:0.7rem; font-weight:700; cursor:pointer;">📥 Export My Data</button>
-            <button onclick="deleteMyAccount()" style="background:none; border:1px solid rgba(248,113,113,0.2); color:#f87171; padding:8px 16px; border-radius:10px; font-size:0.7rem; font-weight:700; cursor:pointer;">🗑️ Delete Account</button>
+            <button onclick="exportMyData()" style="background:none; border:1px solid rgba(255,255,255,0.1); color:var(--text-dim); padding:12px 20px; border-radius:10px; font-size:0.75rem; font-weight:700; cursor:pointer; min-height:44px; display:inline-flex; align-items:center; justify-content:center;" aria-label="Export my profile data in JSON format">📥 Export My Data</button>
+            <button onclick="deleteMyAccount()" style="background:none; border:1px solid rgba(248,113,113,0.2); color:#f87171; padding:12px 20px; border-radius:10px; font-size:0.75rem; font-weight:700; cursor:pointer; min-height:44px; display:inline-flex; align-items:center; justify-content:center;" aria-label="Permanently delete my account">🗑️ Delete Account</button>
           </div>
         </div>
         
         <div style="margin-top: 28px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 24px; display: grid; gap: 12px;">
-          <button class="btn-strava" id="stravaConnectBtnOnboarding" onclick="connectStrava()" style="font-size: 0.9rem;">
+          <button class="btn-strava" id="stravaConnectBtnOnboarding" onclick="connectStrava()" style="font-size: 0.9rem;" aria-label="Connect your Strava account">
             <span>🚴</span> Connect Strava Account
+          </button>
         </div>
       </div>
 
@@ -143,18 +146,20 @@
 
       <div class="card">
         <h2 style="font-size: 1.8rem; margin-bottom: 24px;">Log Your Impact Today</h2>
-        <div class="fg" style="position:relative; margin-bottom: 20px;">
-          <label style="color: var(--text-dim); font-size: 0.75rem; font-weight: 800; text-transform: uppercase;">Origin</label>
-          <input type="text" id="originInp" placeholder="Enter street or landmark" oninput="handleAutocomplete(this, 'origin-results')">
-          <div id="origin-results" class="autocomplete-results"></div>
+        <div class="fg">
+          <label for="originInp">Origin</label>
+          <input type="text" id="originInp" placeholder="Enter street or landmark" oninput="handleAutocomplete(this, 'origin-results')" aria-required="true" aria-autocomplete="list" aria-controls="origin-results">
+          <div id="origin-results" class="autocomplete-results" role="listbox"></div>
+          <span id="originInp-error" class="error-message" style="display: none;" aria-live="polite"></span>
         </div>
-        <div class="fg" style="position:relative; margin-bottom: 20px;">
-          <label style="color: var(--text-dim); font-size: 0.75rem; font-weight: 800; text-transform: uppercase;">Destination (Campus)</label>
-          <input type="text" id="destInp" placeholder="Campus Building" oninput="handleAutocomplete(this, 'dest-results')">
-          <div id="dest-results" class="autocomplete-results"></div>
+        <div class="fg">
+          <label for="destInp">Destination (Campus)</label>
+          <input type="text" id="destInp" placeholder="Campus Building" oninput="handleAutocomplete(this, 'dest-results')" aria-required="true" aria-autocomplete="list" aria-controls="dest-results">
+          <div id="dest-results" class="autocomplete-results" role="listbox"></div>
+          <span id="destInp-error" class="error-message" style="display: none;" aria-live="polite"></span>
         </div>
-        <div class="fg" style="margin-bottom: 20px;">
-          <label style="color: var(--text-dim); font-size: 0.75rem; font-weight: 800; text-transform: uppercase;">Transport Mode</label>
+        <div class="fg">
+          <label for="transportType">Transport Mode</label>
           <select id="transportType">
             <option value="bicycle">🚲 Bicycle</option>
             <option value="walk">🚶 Walk</option>
@@ -164,8 +169,8 @@
             <option value="carpool">🚗 Carpool</option>
           </select>
         </div>
-        <div class="fg" style="margin-bottom: 20px;">
-          <label style="color: var(--text-dim); font-size: 0.75rem; font-weight: 800; text-transform: uppercase;">Main Diet</label>
+        <div class="fg">
+          <label for="foodType">Main Diet</label>
           <select id="foodType">
             <option value="0.8">🥗 Vegan</option>
             <option value="1.5">🥦 Vegetarian</option>
@@ -174,11 +179,12 @@
           </select>
         </div>
         <div class="fg">
-          <label style="color: var(--text-dim); font-size: 0.75rem; font-weight: 800; text-transform: uppercase;">Energy (Appliances Hours)</label>
-          <input type="number" id="elecHours" value="4" min="0" max="24">
+          <label for="elecHours">Energy (Appliances Hours)</label>
+          <input type="number" id="elecHours" value="4" min="0" max="24" aria-required="true">
+          <span id="elecHours-error" class="error-message" style="display: none;" aria-live="polite"></span>
         </div>
 
-        <div id="ai-smart-logger-section" style="margin-top: 30px; border: 2px solid #ff0000; border-radius: 20px; padding: 20px; background: rgba(255, 0, 0, 0.1); display: block !important; visibility: visible !important;">
+        <div id="ai-smart-logger-section" style="margin-top: 32px; border: 1.5px dashed rgba(74, 222, 128, 0.35); border-radius: 20px; padding: 24px; background: rgba(74, 222, 128, 0.03); display: block !important; visibility: visible !important; box-shadow: inset 0 0 12px rgba(74, 222, 128, 0.05);">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
             <h3 style="font-size: 1.1rem; color: var(--primary); margin:0;">AI Smart Recipe Logger</h3>
             <span style="font-size:0.6rem; background:var(--primary); color:var(--navy); padding:2px 8px; border-radius:10px; font-weight:900; text-transform:uppercase;">New</span>
@@ -186,18 +192,18 @@
           <p style="color:var(--text-dim); font-size:0.75rem; margin-bottom:15px; line-height:1.4;">Upload a recipe image, scan a receipt, or paste meal text. EcoBot will calculate exact calories and carbon impact.</p>
           
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px;">
-            <button class="btn-strava" style="background: rgba(74, 222, 128, 0.1); color: #4ade80; border-color: rgba(74, 222, 128, 0.3); font-size: 0.8rem; padding: 12px;" onclick="document.getElementById('receiptInput').click()">
+            <button class="btn-strava" style="background: rgba(74, 222, 128, 0.1); color: #4ade80; border-color: rgba(74, 222, 128, 0.3); font-size: 0.8rem; padding: 14px 18px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; margin: 0;" onclick="document.getElementById('receiptInput').click()" aria-label="Scan recipe or receipt image">
               <span>📸</span> Scan Recipe/Receipt
             </button>
-            <button class="btn-strava" style="background: rgba(255, 255, 255, 0.05); color: white; border-color: rgba(255, 255, 255, 0.1); font-size: 0.8rem; padding: 12px;" onclick="toggleFoodList()">
+            <button class="btn-strava" style="background: rgba(255, 255, 255, 0.05); color: white; border-color: rgba(255, 255, 255, 0.1); font-size: 0.8rem; padding: 14px 18px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; margin: 0;" onclick="toggleFoodList()" aria-label="Toggle food list recipe input text field">
               <span>📝</span> Paste Recipe Text
             </button>
           </div>
-          <input type="file" id="receiptInput" style="display:none;" accept="image/*" onchange="handleReceiptUpload(this)">
+          <input type="file" id="receiptInput" style="display:none;" accept="image/*" onchange="handleReceiptUpload(this)" aria-label="Upload receipt image">
           
           <div id="foodListArea" style="display:none; margin-bottom: 15px;">
-            <textarea id="foodListText" placeholder="e.g. Recipe: 200g Paneer, 1 cup Rice, 1 tbsp Oil..." style="width:100%; height:80px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1); border-radius:12px; color:white; padding:12px; font-family:inherit; font-size:0.9rem;"></textarea>
-            <button class="btn-primary" style="margin-top: 8px; padding: 10px; font-size: 0.8rem;" onclick="analyzeFoodList()">Analyze Recipe →</button>
+            <textarea id="foodListText" placeholder="e.g. Recipe: 200g Paneer, 1 cup Rice, 1 tbsp Oil..." style="width:100%; height:80px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1); border-radius:12px; color:white; padding:12px; font-family:inherit; font-size:0.9rem;" aria-label="Enter ingredients list text"></textarea>
+            <button class="btn-primary" style="margin-top: 8px; padding: 12px; font-size: 0.85rem; min-height: 44px;" onclick="analyzeFoodList()" aria-label="Analyze ingredients list">Analyze Recipe →</button>
           </div>
 
           <div id="smartFoodResult" style="display:none; background: rgba(74, 222, 128, 0.05); border: 1px solid rgba(74, 222, 128, 0.1); border-radius:16px; padding:15px; margin-top: 15px;">
@@ -210,8 +216,7 @@
           </div>
         </div>
         
-        
-        <button class="btn-primary" id="calcBtn" onclick="calculateCarbon()" style="margin-top: 30px;">Calculate Footprint</button>
+        <button class="btn-primary" id="calcBtn" onclick="calculateCarbon()" style="margin-top: var(--space-xl);">Calculate Footprint</button>
       </div>
     </div>
   </section>
@@ -277,8 +282,8 @@
             </div>
             <span class="brand-name" style="font-size:1.2rem;">EcoTracker</span>
           </div>
-          <div style="display:flex; gap:30px; font-weight:800; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-dim);">
-            <a href="#" style="color:var(--primary); text-decoration:underline; text-underline-offset:8px;" onclick="showScreen('screen-dashboard')">Home</a>
+          <div style="display:flex; gap:30px; font-weight:800; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-dim); align-items:center;">
+            <a href="#" style="color:var(--primary); text-decoration:underline; text-underline-offset:8px; padding:12px 16px; min-height:44px; display:inline-flex; align-items:center; border-radius:8px;" onclick="showScreen('screen-dashboard')" aria-label="Navigate to Home Dashboard">Home</a>
           </div>
         </div>
       </nav>
@@ -300,8 +305,8 @@
             </div>
             <span class="brand-name" style="font-size:1.2rem;">EcoTracker</span>
           </div>
-          <div style="display:flex; gap:30px; font-weight:800; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-dim);">
-            <a href="#" style="color:var(--primary); text-decoration:underline; text-underline-offset:8px;" onclick="showScreen('screen-dashboard')">Home</a>
+          <div style="display:flex; gap:30px; font-weight:800; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-dim); align-items:center;">
+            <a href="#" style="color:var(--primary); text-decoration:underline; text-underline-offset:8px; padding:12px 16px; min-height:44px; display:inline-flex; align-items:center; border-radius:8px;" onclick="showScreen('screen-dashboard')" aria-label="Navigate to Home Dashboard">Home</a>
           </div>
         </div>
         <div style="display:flex; align-items:center; gap:15px;">
@@ -317,7 +322,7 @@
           <p class="hero-sub" style="margin-bottom:40px;">Every action on campus ripples through the digital arboretum. Monitor your real-time carbon sequestration and lead the charge for a greener future.</p>
           
           <div style="display:flex; gap:20px; margin-bottom:80px;">
-            <button class="btn-primary" onclick="showScreen('screen-calculator')" style="width:auto; padding:20px 40px; font-size:1rem; border-radius:99px; margin:0;">Log New Activity</button>
+            <button class="btn-primary" onclick="showScreen('screen-calculator')" style="width:auto; padding:20px 40px; font-size:1.1rem; border-radius:99px; margin:0; font-weight:800; background:linear-gradient(135deg, var(--primary) 0%, #22C55E 100%); min-height:44px; display:inline-flex; align-items:center; justify-content:center;">Log New Activity</button>
           </div>
 
           <!-- Sync Center -->
@@ -644,6 +649,64 @@
     </div>
   </section>
 
+  <!-- MESSAGES SCREEN -->
+  <section id="s-messages" class="screen">
+    <div class="app-shell" style="max-width:1100px; padding-bottom:120px;">
+      <div style="margin-bottom:30px;">
+        <h1 style="font-family:'Outfit'; font-size:2.8rem; font-weight:900; line-height:1.1;">Live <span style="color:var(--primary);">Chat</span></h1>
+        <p style="color:var(--text-dim); font-size:0.85rem; font-weight:600;">Connect with campus eco warriors in real-time</p>
+      </div>
+
+      <div class="chat-container">
+        <!-- Sidebar: list of users -->
+        <div class="chat-sidebar">
+          <div class="chat-sidebar-header">
+            <h3>Friend Sync</h3>
+          </div>
+          <div id="chat-user-list" class="chat-user-list">
+            <div style="text-align:center; padding:30px; color:var(--text-dim);">Loading friends...</div>
+          </div>
+        </div>
+
+        <!-- Chat Area -->
+        <div id="chat-main-area" class="chat-main">
+          <!-- Empty State -->
+          <div id="chat-empty-state" class="chat-empty-state">
+            <span class="chat-empty-state-icon">💬</span>
+            <p style="font-weight:800; font-size:1.1rem; color:white;">Start a Conversation</p>
+            <p style="font-size:0.85rem; margin-top:8px; max-width:280px;">Select an active user from the sidebar to coordinate campus green activities!</p>
+          </div>
+
+          <!-- Active Chat (hidden by default) -->
+          <div id="chat-active-window" style="display:none; flex-direction:column; height:100%;">
+            <div class="chat-header">
+              <div id="active-chat-avatar" class="chat-header-avatar">A</div>
+              <div class="chat-header-details">
+                <h4 id="active-chat-username">Username</h4>
+                <p id="active-chat-dept">Department</p>
+              </div>
+            </div>
+            
+            <!-- Scrolling Message Feed -->
+            <div id="chat-message-feed" class="chat-messages">
+              <!-- Bubbles will be injected here -->
+            </div>
+
+            <!-- Message Input Form -->
+            <div class="chat-input-area">
+              <form id="chat-send-form" class="chat-input-form" onsubmit="event.preventDefault(); sendChatMessage();">
+                <input type="text" id="chat-message-input" class="chat-input" placeholder="Type a message..." autocomplete="off" aria-label="Message content input field">
+                <button type="submit" class="chat-send-btn" aria-label="Send message">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <nav class="bottom-nav hidden" id="mainNav" role="navigation" aria-label="Main navigation">
     <a href="#" class="nav-item" onclick="showScreen('screen-dashboard')" role="button" aria-label="Home">
       <span class="nav-icon">🏠</span>
@@ -669,6 +732,10 @@
       <span class="nav-icon">🌱</span>
       <span>Wallet</span>
     </a>
+    <a href="#" class="nav-item" onclick="showScreen('s-messages')" role="button" aria-label="Chat">
+      <span class="nav-icon">💬</span>
+      <span>Chat</span>
+    </a>
     <a href="#" class="nav-item" onclick="showScreen('screen-leaderboard')" role="button" aria-label="Leaderboard">
       <div class="nav-icon">🏆</div>
       <span>Rank</span>
@@ -683,7 +750,7 @@
   window.impactChartInstance = null;
   window.trendChartInstance = null;
 </script>
-<script src="/static/main.js?v=3.2"></script>
+<script src="/static/main.js?v=4.0"></script>
 
 <!-- PWA Service Worker Registration -->
 <script>

@@ -10,3 +10,5 @@ Pillow
 python-dotenv
 waitress
 psycopg2-binary
+flask-socketio
+python-socketio

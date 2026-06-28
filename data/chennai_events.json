@@ -1,20 +1,6 @@
 {
   "events": [
     {
-      "id": "dyn-evt-001",
-      "title": "Besant Nagar Beach Cleanup Drive",
-      "time": "06:00 AM - 09:00 AM",
-      "location": "Besant Nagar Beach, Elliot's Beach, Chennai",
-      "description": "Join volunteers for a massive shoreline cleanup. Help remove plastic waste and microplastics from one of Chennai's most iconic beaches. Gloves and bags provided.",
-      "category": "cleanup",
-      "organizer": "Chennai Coastal Conservation Group",
-      "contact_url": "https://example.com/besant-cleanup",
-      "emoji": "🏖️",
-      "attendees": 187,
-      "max_attendees": 300,
-      "date": "2026-06-27"
-    },
-    {
       "id": "dyn-evt-002",
       "title": "Adyar Eco Park – 1000 Trees Plantation",
       "time": "07:00 AM - 11:00 AM",
@@ -29,20 +15,6 @@
       "date": "2026-06-28"
     },
     {
-      "id": "dyn-evt-003",
-      "title": "IIT Madras – Carbon Neutrality Workshop",
-      "time": "10:00 AM - 04:00 PM",
-      "location": "IC & SR Auditorium, IIT Madras, Chennai",
-      "description": "A full-day hands-on workshop on measuring your carbon footprint, understanding emission sources, and building personal action plans.",
-      "category": "workshop",
-      "organizer": "IIT Madras Sustainability Cell",
-      "contact_url": "https://example.com/iitm-workshop",
-      "emoji": "🎓",
-      "attendees": 89,
-      "max_attendees": 150,
-      "date": "2026-06-24"
-    },
-    {
       "id": "dyn-evt-004",
       "title": "Marina to Mylapore Eco Cycling Rally",
       "time": "05:30 AM - 08:00 AM",
@@ -55,16 +27,44 @@
       "attendees": 256,
       "max_attendees": 400,
       "date": "2026-07-02"
+    },
+    {
+      "id": "dyn-evt-001",
+      "title": "Besant Nagar Beach Cleanup Drive",
+      "time": "06:00 AM - 09:00 AM",
+      "location": "Besant Nagar Beach, Elliot's Beach, Chennai",
+      "description": "Join volunteers for a massive shoreline cleanup. Help remove plastic waste and microplastics from one of Chennai's most iconic beaches. Gloves and bags provided.",
+      "category": "cleanup",
+      "organizer": "Chennai Coastal Conservation Group",
+      "contact_url": "https://example.com/besant-cleanup",
+      "emoji": "🏖️",
+      "attendees": 187,
+      "max_attendees": 300,
+      "date": "2026-07-03"
+    },
+    {
+      "id": "dyn-evt-003",
+      "title": "IIT Madras – Carbon Neutrality Workshop",
+      "time": "10:00 AM - 04:00 PM",
+      "location": "IC & SR Auditorium, IIT Madras, Chennai",
+      "description": "A full-day hands-on workshop on measuring your carbon footprint, understanding emission sources, and building personal action plans.",
+      "category": "workshop",
+      "organizer": "IIT Madras Sustainability Cell",
+      "contact_url": "https://example.com/iitm-workshop",
+      "emoji": "🎓",
+      "attendees": 89,
+      "max_attendees": 150,
+      "date": "2026-06-30"
     }
   ],
   "news": [
     {
-      "id": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxNa1ZjNHlxWUZfZkRHQXUxUFUwVk56VlBHQWtxazNMOWtfbml0ZGJVVE95ZVlwMVRsalVGSF96UGJRMmVuUTFGamR2YkQtQUNSZVMta3F1Z3FJZllwTF9uSlV5YXozVFhQN2E4MnRfVDNhMVZrTW56eEY0Wkh0Mk9QUFZreVZkUzY1M0hkVUpCNF9ZRHJsalVRNHA5UDRUTnFRUDNkeGRGZnVjTlJaLXo5RzFYWF9ldUo5aERj?oc=5",
-      "title": "Tamil Nadu plants 20,000 mangroves along Buckingham canal to boost Chennai’s climate resilience",
-      "source": "DD News",
-      "date": "Mon, 22 Jun 2026 07:30:43 GMT",
-      "summary": "Live update from DD News",
-      "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxNa1ZjNHlxWUZfZkRHQXUxUFUwVk56VlBHQWtxazNMOWtfbml0ZGJVVE95ZVlwMVRsalVGSF96UGJRMmVuUTFGamR2YkQtQUNSZVMta3F1Z3FJZllwTF9uSlV5YXozVFhQN2E4MnRfVDNhMVZrTW56eEY0Wkh0Mk9QUFZreVZkUzY1M0hkVUpCNF9ZRHJsalVRNHA5UDRUTnFRUDNkeGRGZnVjTlJaLXo5RzFYWF9ldUo5aERj?oc=5",
+      "id": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxQSG9pd011blhFV1NOWUl5bkpVc3MzdGk5N1dTLW9BbjVNSHRZUDFkdzF1Y2JUcU04NVY2YkNBMGIwV1h1MEdRNkZSXzRBdmZtdzM5NlBoaE01aGVTek9CNWlUTnNSc0Qyb0JGRzhMNkZiYkFXeS1vRUhzVXI3ZWFzc0I2WW9lN0tfQUV3X1JObXNWZGhCaDA4SFBlNVZySGgyZmtidzNVZEhnelU0UjVkdm9SRVRmeTZ4SjV6T2FzaE93SzBCa3g5aWp5aUQtRFpaYl9sZNIB2wFBVV95cUxOZnljQTQwRWl3STVTMWpUTnVmQnFMckJzWmJtYlJKUlB0TTJBUjdNOS12YTR5RkU2VFBWTG1YV3N1NUZieXIzalgyUUpZZDNpZldHU3JlX3dmT0Y4ZUdwNFB2NzhIblNyMl85QmF6a1FyX2VfMVRJNDU1VlQyMEc3ZzAyRkpJaDMyenExcm05dDlVMTk5a2xQOXZDWmpMWjlkZEhaSkVSQ1BubEJsdUxvVDVsUHlQRzgxWW5UcTMwTkRnNWpSSEI2QVRYX1VtQmhrd3VucmlQSmtxX2c?oc=5",
+      "title": "Chennai may see 1°C rise in summer temperatures by 2040: Report",
+      "source": "The Hindu",
+      "date": "Fri, 05 Jun 2026 07:00:00 GMT",
+      "summary": "Live update from The Hindu",
+      "url": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxQSG9pd011blhFV1NOWUl5bkpVc3MzdGk5N1dTLW9BbjVNSHRZUDFkdzF1Y2JUcU04NVY2YkNBMGIwV1h1MEdRNkZSXzRBdmZtdzM5NlBoaE01aGVTek9CNWlUTnNSc0Qyb0JGRzhMNkZiYkFXeS1vRUhzVXI3ZWFzc0I2WW9lN0tfQUV3X1JObXNWZGhCaDA4SFBlNVZySGgyZmtidzNVZEhnelU0UjVkdm9SRVRmeTZ4SjV6T2FzaE93SzBCa3g5aWp5aUQtRFpaYl9sZNIB2wFBVV95cUxOZnljQTQwRWl3STVTMWpUTnVmQnFMckJzWmJtYlJKUlB0TTJBUjdNOS12YTR5RkU2VFBWTG1YV3N1NUZieXIzalgyUUpZZDNpZldHU3JlX3dmT0Y4ZUdwNFB2NzhIblNyMl85QmF6a1FyX2VfMVRJNDU1VlQyMEc3ZzAyRkpJaDMyenExcm05dDlVMTk5a2xQOXZDWmpMWjlkZEhaSkVSQ1BubEJsdUxvVDVsUHlQRzgxWW5UcTMwTkRnNWpSSEI2QVRYX1VtQmhrd3VucmlQSmtxX2c?oc=5",
       "category": "news",
       "emoji": "📰"
     },
@@ -79,22 +79,22 @@
       "emoji": "📰"
     },
     {
-      "id": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxQSG9pd011blhFV1NOWUl5bkpVc3MzdGk5N1dTLW9BbjVNSHRZUDFkdzF1Y2JUcU04NVY2YkNBMGIwV1h1MEdRNkZSXzRBdmZtdzM5NlBoaE01aGVTek9CNWlUTnNSc0Qyb0JGRzhMNkZiYkFXeS1vRUhzVXI3ZWFzc0I2WW9lN0tfQUV3X1JObXNWZGhCaDA4SFBlNVZySGgyZmtidzNVZEhnelU0UjVkdm9SRVRmeTZ4SjV6T2FzaE93SzBCa3g5aWp5aUQtRFpaYl9sZNIB2wFBVV95cUxOZnljQTQwRWl3STVTMWpUTnVmQnFMckJzWmJtYlJKUlB0TTJBUjdNOS12YTR5RkU2VFBWTG1YV3N1NUZieXIzalgyUUpZZDNpZldHU3JlX3dmT0Y4ZUdwNFB2NzhIblNyMl85QmF6a1FyX2VfMVRJNDU1VlQyMEc3ZzAyRkpJaDMyenExcm05dDlVMTk5a2xQOXZDWmpMWjlkZEhaSkVSQ1BubEJsdUxvVDVsUHlQRzgxWW5UcTMwTkRnNWpSSEI2QVRYX1VtQmhrd3VucmlQSmtxX2c?oc=5",
-      "title": "Chennai may see 1°C rise in summer temperatures by 2040: Report",
-      "source": "The Hindu",
-      "date": "Fri, 05 Jun 2026 07:00:00 GMT",
-      "summary": "Live update from The Hindu",
-      "url": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxQSG9pd011blhFV1NOWUl5bkpVc3MzdGk5N1dTLW9BbjVNSHRZUDFkdzF1Y2JUcU04NVY2YkNBMGIwV1h1MEdRNkZSXzRBdmZtdzM5NlBoaE01aGVTek9CNWlUTnNSc0Qyb0JGRzhMNkZiYkFXeS1vRUhzVXI3ZWFzc0I2WW9lN0tfQUV3X1JObXNWZGhCaDA4SFBlNVZySGgyZmtidzNVZEhnelU0UjVkdm9SRVRmeTZ4SjV6T2FzaE93SzBCa3g5aWp5aUQtRFpaYl9sZNIB2wFBVV95cUxOZnljQTQwRWl3STVTMWpUTnVmQnFMckJzWmJtYlJKUlB0TTJBUjdNOS12YTR5RkU2VFBWTG1YV3N1NUZieXIzalgyUUpZZDNpZldHU3JlX3dmT0Y4ZUdwNFB2NzhIblNyMl85QmF6a1FyX2VfMVRJNDU1VlQyMEc3ZzAyRkpJaDMyenExcm05dDlVMTk5a2xQOXZDWmpMWjlkZEhaSkVSQ1BubEJsdUxvVDVsUHlQRzgxWW5UcTMwTkRnNWpSSEI2QVRYX1VtQmhrd3VucmlQSmtxX2c?oc=5",
+      "id": "https://news.google.com/rss/articles/CBMivgFBVV95cUxQUngwNGRDcXpBemU4QVk2dS12WEFQbXkwNTJiUTZXbGh0bHJwbmE5U0Vad1dWeDdpVnBUcnUwVDVJTlBaRVRDOTRZTXd5UzgyQ0l5VjZMeWJnTXV5NDdEZDIxVVdjdlVCOEo2VmhCYzB0N2xEdnZiZnlyYXVEdVg2N0ctbjBNajlLR01XN2s4SGpmSXFra3BSS2ZGd21leG1FTEptckJJTE9lVVZZbTBfclFqaDU5WW01X2VXSTVB0gHDAUFVX3lxTE9KamRMTnRmb0xCWGlTY2g0aHp1c1VyY3g4SGw0elQ2eDNJTk5pNjdVcWxVaVp5bzZOUjlSM21KYkRYc3gxU1ZoOW50VUhUWE1DR2tCLUtvM01lM3N1YkxXSnI2MWRnVjQzUmNNcjRnTWhkSk9zcDlyQ3UxRVJFRXdRdnRDMHZsTlc4UER0ZXRhbHJxcWxYYlFaaHpCaEZsaWM1bklDNnB2a2xvanRLNUZhQVNLZ1JNMTVYbUlNZWYxUGZPNA?oc=5",
+      "title": "‘India needs a climate change policy for elders’",
+      "source": "The Times of India",
+      "date": "Tue, 16 Jun 2026 07:00:00 GMT",
+      "summary": "Live update from The Times of India",
+      "url": "https://news.google.com/rss/articles/CBMivgFBVV95cUxQUngwNGRDcXpBemU4QVk2dS12WEFQbXkwNTJiUTZXbGh0bHJwbmE5U0Vad1dWeDdpVnBUcnUwVDVJTlBaRVRDOTRZTXd5UzgyQ0l5VjZMeWJnTXV5NDdEZDIxVVdjdlVCOEo2VmhCYzB0N2xEdnZiZnlyYXVEdVg2N0ctbjBNajlLR01XN2s4SGpmSXFra3BSS2ZGd21leG1FTEptckJJTE9lVVZZbTBfclFqaDU5WW01X2VXSTVB0gHDAUFVX3lxTE9KamRMTnRmb0xCWGlTY2g0aHp1c1VyY3g4SGw0elQ2eDNJTk5pNjdVcWxVaVp5bzZOUjlSM21KYkRYc3gxU1ZoOW50VUhUWE1DR2tCLUtvM01lM3N1YkxXSnI2MWRnVjQzUmNNcjRnTWhkSk9zcDlyQ3UxRVJFRXdRdnRDMHZsTlc4UER0ZXRhbHJxcWxYYlFaaHpCaEZsaWM1bklDNnB2a2xvanRLNUZhQVNLZ1JNMTVYbUlNZWYxUGZPNA?oc=5",
       "category": "news",
       "emoji": "📰"
     },
     {
-      "id": "https://news.google.com/rss/articles/CBMivgFBVV95cUxQUngwNGRDcXpBemU4QVk2dS12WEFQbXkwNTJiUTZXbGh0bHJwbmE5U0Vad1dWeDdpVnBUcnUwVDVJTlBaRVRDOTRZTXd5UzgyQ0l5VjZMeWJnTXV5NDdEZDIxVVdjdlVCOEo2VmhCYzB0N2xEdnZiZnlyYXVEdVg2N0ctbjBNajlLR01XN2s4SGpmSXFra3BSS2ZGd21leG1FTEptckJJTE9lVVZZbTBfclFqaDU5WW01X2VXSTVB0gHDAUFVX3lxTE9KamRMTnRmb0xCWGlTY2g0aHp1c1VyY3g4SGw0elQ2eDNJTk5pNjdVcWxVaVp5bzZOUjlSM21KYkRYc3gxU1ZoOW50VUhUWE1DR2tCLUtvM01lM3N1YkxXSnI2MWRnVjQzUmNNcjRnTWhkSk9zcDlyQ3UxRVJFRXdRdnRDMHZsTlc4UER0ZXRhbHJxcWxYYlFaaHpCaEZsaWM1bklDNnB2a2xvanRLNUZhQVNLZ1JNMTVYbUlNZWYxUGZPNA?oc=5",
-      "title": "‘India needs a climate change policy for elders’",
-      "source": "The Times of India",
-      "date": "Tue, 16 Jun 2026 09:20:00 GMT",
-      "summary": "Live update from The Times of India",
-      "url": "https://news.google.com/rss/articles/CBMivgFBVV95cUxQUngwNGRDcXpBemU4QVk2dS12WEFQbXkwNTJiUTZXbGh0bHJwbmE5U0Vad1dWeDdpVnBUcnUwVDVJTlBaRVRDOTRZTXd5UzgyQ0l5VjZMeWJnTXV5NDdEZDIxVVdjdlVCOEo2VmhCYzB0N2xEdnZiZnlyYXVEdVg2N0ctbjBNajlLR01XN2s4SGpmSXFra3BSS2ZGd21leG1FTEptckJJTE9lVVZZbTBfclFqaDU5WW01X2VXSTVB0gHDAUFVX3lxTE9KamRMTnRmb0xCWGlTY2g0aHp1c1VyY3g4SGw0elQ2eDNJTk5pNjdVcWxVaVp5bzZOUjlSM21KYkRYc3gxU1ZoOW50VUhUWE1DR2tCLUtvM01lM3N1YkxXSnI2MWRnVjQzUmNNcjRnTWhkSk9zcDlyQ3UxRVJFRXdRdnRDMHZsTlc4UER0ZXRhbHJxcWxYYlFaaHpCaEZsaWM1bklDNnB2a2xvanRLNUZhQVNLZ1JNMTVYbUlNZWYxUGZPNA?oc=5",
+      "id": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxOalpRNm5kcU50VU40aTZROUUwMHAtUk5QaVNJVEtzNGRmSmk3NlRuMUUyakdiOURFTzdSby1aUktRenhESEZJcklrY3JndWNIOC1JT0VLYlZ5TDBJUTJyMzJRdWFPUEVhNXd2ckxBSU9ENTN5bEFlZ3RINU1DMTRqbUdGWEFuZW5NTHM5SWxkSWNQdU10bndGLURrSnNoS0lqRGc5SmhUU2tOX2xfaTJFaUtuNU0wRHRlb3otN1BaU3EzaUduLV9Gczc4T3ZEbTd6S2ln0gGjAUFVX3lxTE45YnFZSGtORTgxOXV3TEx0SFd2RkJSMy1nWjdhbENBakJxbEluMURRaXYyV29pVF84ZWllLUJOZnBpZENIZVRGblAtal9NU01jcUdlLW5nZEdIT1RWMU9NLUJfTms3TFVRRHdTTzNUWThtSjNhS2NzeDU1NUl0M3lEaC1qc3pNc0d6TlBEUGxjRmhWY3ZBT1ZYdVVLeTV4QnhPXzQ?oc=5",
+      "title": "PG Diploma in Climate Change launched at Anna University",
+      "source": "DT Next",
+      "date": "Tue, 16 Jun 2026 15:44:44 GMT",
+      "summary": "Live update from DT Next",
+      "url": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxOalpRNm5kcU50VU40aTZROUUwMHAtUk5QaVNJVEtzNGRmSmk3NlRuMUUyakdiOURFTzdSby1aUktRenhESEZJcklrY3JndWNIOC1JT0VLYlZ5TDBJUTJyMzJRdWFPUEVhNXd2ckxBSU9ENTN5bEFlZ3RINU1DMTRqbUdGWEFuZW5NTHM5SWxkSWNQdU10bndGLURrSnNoS0lqRGc5SmhUU2tOX2xfaTJFaUtuNU0wRHRlb3otN1BaU3EzaUduLV9Gczc4T3ZEbTd6S2ln0gGjAUFVX3lxTE45YnFZSGtORTgxOXV3TEx0SFd2RkJSMy1nWjdhbENBakJxbEluMURRaXYyV29pVF84ZWllLUJOZnBpZENIZVRGblAtal9NU01jcUdlLW5nZEdIT1RWMU9NLUJfTms3TFVRRHdTTzNUWThtSjNhS2NzeDU1NUl0M3lEaC1qc3pNc0d6TlBEUGxjRmhWY3ZBT1ZYdVVLeTV4QnhPXzQ?oc=5",
       "category": "news",
       "emoji": "📰"
     },
@@ -119,16 +119,6 @@
       "emoji": "📰"
     },
     {
-      "id": "https://news.google.com/rss/articles/CBMitgFBVV95cUxNSXhvTVhoRVJkWFhoQTdVRHZFelFaUWVOZmM4ZEYxbjVyTHdtQlZ3cDd0NGlRcTV6RTRvLUtvelBISHFkT2N0ZTlkekNUX216bnczN0JQcy1XOG1KTUxQdTNVdWNhaGZTb3NOSHVCbTZvMkg3RnFIQXpBRXZzMWlIenhsTTNUWEFDQ2lKSWZzY3ltNWNkNzhSbUVqR1J4eEpfdUt2WUVlbl90OFM3YnZHeUpwQjl1Zw?oc=5",
-      "title": "Why is Chennai like Ooty these days? Scientist S Balachandran explains",
-      "source": "The Federal",
-      "date": "Mon, 26 Jan 2026 08:00:00 GMT",
-      "summary": "Live update from The Federal",
-      "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxNSXhvTVhoRVJkWFhoQTdVRHZFelFaUWVOZmM4ZEYxbjVyTHdtQlZ3cDd0NGlRcTV6RTRvLUtvelBISHFkT2N0ZTlkekNUX216bnczN0JQcy1XOG1KTUxQdTNVdWNhaGZTb3NOSHVCbTZvMkg3RnFIQXpBRXZzMWlIenhsTTNUWEFDQ2lKSWZzY3ltNWNkNzhSbUVqR1J4eEpfdUt2WUVlbl90OFM3YnZHeUpwQjl1Zw?oc=5",
-      "category": "news",
-      "emoji": "📰"
-    },
-    {
       "id": "https://news.google.com/rss/articles/CBMixAFBVV95cUxQTXBFRHNRdmdIN3FHMHNua204UXZROWJIYWRmNG9QaFJpdW9YQkptNXBPY2gxUWtHWTNfV1drcFdsT2lNTEoyM2hmTmlwLUhvNk5Ub2dhZ2xpcDc3VFJnVDlZYV9aTDlOM0dmbjhpN3ZLX2FURm9BTlREYll5YnRzYXBsNHFfRGN1Wl9fd3F4S2xCUFQ5ZHdGcG94N2l3cXI0NUNJMzVOOEJ1cnMycFJnMlMyR25UU1FmVTVWYkd6Qm1UTW5W0gHKAUFVX3lxTE54cnRheG40aXFRd2MzU0RKVDYtajFfaTJzUlFueTFLamJFSFBMc1N5cElvSHB4NGJ0d2xTOWhGMmRid2Q5emdaclJ0SmV0bERpU2dZVUhub2tLSU1ZRlZqbFQ4TVdrX25Kc0JyYm13TlVmZ2s4RDV1cmVIZG5yWmZDeHNYYlBMMkY0RENJOGRCVDZ4aFE4QktRMTNiTDhSU1A4bE5XQmg5VUpKMUROaHZNdTlEVjh2dzcwVjVmYmcwNFc2SXd2b193bWc?oc=5",
       "title": "February Fog: Climate Change Rewriting City’s Weather Profile?",
       "source": "Deccan Chronicle",
@@ -137,7 +127,17 @@
       "url": "https://news.google.com/rss/articles/CBMixAFBVV95cUxQTXBFRHNRdmdIN3FHMHNua204UXZROWJIYWRmNG9QaFJpdW9YQkptNXBPY2gxUWtHWTNfV1drcFdsT2lNTEoyM2hmTmlwLUhvNk5Ub2dhZ2xpcDc3VFJnVDlZYV9aTDlOM0dmbjhpN3ZLX2FURm9BTlREYll5YnRzYXBsNHFfRGN1Wl9fd3F4S2xCUFQ5ZHdGcG94N2l3cXI0NUNJMzVOOEJ1cnMycFJnMlMyR25UU1FmVTVWYkd6Qm1UTW5W0gHKAUFVX3lxTE54cnRheG40aXFRd2MzU0RKVDYtajFfaTJzUlFueTFLamJFSFBMc1N5cElvSHB4NGJ0d2xTOWhGMmRid2Q5emdaclJ0SmV0bERpU2dZVUhub2tLSU1ZRlZqbFQ4TVdrX25Kc0JyYm13TlVmZ2s4RDV1cmVIZG5yWmZDeHNYYlBMMkY0RENJOGRCVDZ4aFE4QktRMTNiTDhSU1A4bE5XQmg5VUpKMUROaHZNdTlEVjh2dzcwVjVmYmcwNFc2SXd2b193bWc?oc=5",
       "category": "news",
       "emoji": "📰"
+    },
+    {
+      "id": "https://news.google.com/rss/articles/CBMi7wFBVV95cUxPMERWdnhwTmZsQlZmZUNaVDlZZW9YVGJmR2hzSUxqenlISUFsX1NGbE43TWZaQmxEbHg5dHdLNmJtV3AwQzlxSHU2cVNUaXJGZzBLRWdwQnRFWlpFOEgteHhCQTE5endZRVdwVWxJTDI1UFlUZ2x2ZmY1LTlVUzhjRWMwRFRTNnl0NDZjT00zRnBvV1I2cTVvZ0tkejVFbS1xeFRpZ29tSE1CaEEwTkU3U0dLb3VpS0tFS1hxRERQamxYNXNoZnBYUFQwZVY3b1d6ZVQ1Rndidm5qeXI0bG1sckp1QzhRQTJfYnpyWGxKd9IB9AFBVV95cUxPcUxINXNybkZPQm45NERfQjhwQU1mQ25LcjR3d25adWIydFNRZV92V0hJS2NmQWNMYl9SSHhkVURjelpmTTVub0RwYlV0RXVuVHdkOG1JRkc2RHNrR0gzSHA5d0NOM2k0cE8wMjJuSndoVnE5N1NQODZvZmZ1NWp1dXlhN0ItYmJhMVczRmpJUFVHNUc3NnBweUZieUdCeHJGRXpkYkxpWjdwVlhWakNSTWk4QncyVk01SHB2c0lEbWJqeWZidWlyVDcwcE5OS1lST2EzZ09rWml3WXBMZEx4UWF6bmo3b1dpcS1FVWdRWEc0QWFI?oc=5",
+      "title": "Hill Station Heatwave: Ooty, Yercaud Temperatures Rise Amidst Climate Change Concerns",
+      "source": "The Times of India",
+      "date": "Tue, 26 May 2026 07:00:00 GMT",
+      "summary": "Live update from The Times of India",
+      "url": "https://news.google.com/rss/articles/CBMi7wFBVV95cUxPMERWdnhwTmZsQlZmZUNaVDlZZW9YVGJmR2hzSUxqenlISUFsX1NGbE43TWZaQmxEbHg5dHdLNmJtV3AwQzlxSHU2cVNUaXJGZzBLRWdwQnRFWlpFOEgteHhCQTE5endZRVdwVWxJTDI1UFlUZ2x2ZmY1LTlVUzhjRWMwRFRTNnl0NDZjT00zRnBvV1I2cTVvZ0tkejVFbS1xeFRpZ29tSE1CaEEwTkU3U0dLb3VpS0tFS1hxRERQamxYNXNoZnBYUFQwZVY3b1d6ZVQ1Rndidm5qeXI0bG1sckp1QzhRQTJfYnpyWGxKd9IB9AFBVV95cUxPcUxINXNybkZPQm45NERfQjhwQU1mQ25LcjR3d25adWIydFNRZV92V0hJS2NmQWNMYl9SSHhkVURjelpmTTVub0RwYlV0RXVuVHdkOG1JRkc2RHNrR0gzSHA5d0NOM2k0cE8wMjJuSndoVnE5N1NQODZvZmZ1NWp1dXlhN0ItYmJhMVczRmpJUFVHNUc3NnBweUZieUdCeHJGRXpkYkxpWjdwVlhWakNSTWk4QncyVk01SHB2c0lEbWJqeWZidWlyVDcwcE5OS1lST2EzZ09rWml3WXBMZEx4UWF6bmo3b1dpcS1FVWdRWEc0QWFI?oc=5",
+      "category": "news",
+      "emoji": "📰"
     }
   ],
-  "last_updated": "2026-06-23T04:59:42.617212"
+  "last_updated": "2026-06-28T14:47:19.325214"
 }

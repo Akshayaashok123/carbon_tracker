@@ -40,8 +40,10 @@ logger = logging.getLogger(__name__)
 from config import Config
 from models import db, User, DailyLog, UserBadge, EventInterest
 from auth import init_auth
+from flask_socketio import SocketIO, emit, join_room
 
 app = Flask(__name__)
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 @app.before_request
 def ignore_content_type_on_get():
@@ -263,13 +265,17 @@ def get_route_data(origin_lat, origin_lon, dest_lat, dest_lon, mode, co2_factor)
         "api_key":     OLA_MAPS_KEY,
     }
     try:
-        r = requests.get(url, params=params, timeout=5).json()
+        r = requests.post(url, params=params, timeout=5).json()
         routes = r.get("routes", [])
         if not routes:
             return None
         leg = routes[0]["legs"][0]
-        dist = leg["distance"]["value"] / 1000
-        time = leg["duration"]["value"] / 60
+        
+        dist_val = leg.get("distance", 0)
+        dist = dist_val.get("value", 0) / 1000 if isinstance(dist_val, dict) else float(dist_val) / 1000
+        
+        dur_val = leg.get("duration", 0)
+        time = dur_val.get("value", 0) / 60 if isinstance(dur_val, dict) else float(dur_val) / 60
         return {
             "dist": round(dist, 2),
             "time": round(time),
@@ -279,6 +285,31 @@ def get_route_data(origin_lat, origin_lon, dest_lat, dest_lon, mode, co2_factor)
         logger.warning("Route data fetch failed: %s", e)
         return None
 
+
+
+def _load_events():
+    events_path = os.path.join(os.path.dirname(__file__), 'data', 'events.json')
+    if not os.path.exists(events_path):
+        return []
+    with open(events_path, 'r', encoding='utf-8') as f:
+        return json.load(f)
+
+def _save_events(events):
+    events_path = os.path.join(os.path.dirname(__file__), 'data', 'events.json')
+    with open(events_path, 'w', encoding='utf-8') as f:
+        json.dump(events, f, indent=2)
+
+@app.route('/api/events', methods=['GET'])
+def get_events():
+    """Return the list of campus events."""
+    try:
+        events = _load_events()
+        return jsonify({'success': True, 'events': events})
+    except Exception as e:
+        logger.exception('Failed to load events')
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+# Duplicate simple matchmaker endpoint removed – using detailed implementation below
 
 # ══════════════════════════════════════════════════════════════
 #  MIDDLEWARE
@@ -1154,6 +1185,67 @@ def get_admin_stats():
         logger.exception("admin stats failed")
         return jsonify({'error': str(e)}), 500
 
+# ── EVENT MATCHMAKING LOGIC ────────────────────────────────────────
+
+def _events_file_path():
+    """Return absolute path to events.json"""
+    return os.path.join(os.path.dirname(__file__), 'data', 'events.json')
+
+def _load_events():
+    """Load events list from JSON file"""
+    path = _events_file_path()
+    if not os.path.exists(path):
+        return []
+    with open(path, 'r', encoding='utf-8') as f:
+        try:
+            return json.load(f)
+        except Exception:
+            return []
+
+def _save_events(events):
+    """Write events list back to JSON file"""
+    path = _events_file_path()
+    with open(path, 'w', encoding='utf-8') as f:
+        json.dump(events, f, indent=2)
+
+@app.route('/api/events/matchmaker', methods=['POST'])
+
+def matchmaker():
+    """Match users who have joined a car‑pool for the same event.
+    Request JSON: {"event_id": <int>, "username": <str>}
+    Returns list of other participants and estimated shared carbon savings.
+    """
+    data = request.get_json() or {}
+    event_id = data.get('event_id')
+    username = (data.get('username') or '').strip()
+    if not event_id or not username:
+        return jsonify({'success': False, 'error': 'event_id and username required'}), 400
+
+    events = _load_events()
+    event = next((e for e in events if e.get('id') == event_id), None)
+    if not event:
+        return jsonify({'success': False, 'error': 'Event not found'}), 404
+
+    attendees = set(event.get('attendees_joined_ride', []))
+    attendees.add(username)
+    event['attendees_joined_ride'] = list(attendees)
+    _save_events(events)
+
+    matched_users = [u for u in attendees if u != username]
+
+    # Simple shared savings calculation – assume a generic distance of 5 km.
+    # Solo emission per km = 0.171 kg CO₂, car‑pool emission per km = 0.068 kg CO₂.
+    distance_km = 5.0
+    solo_co2 = distance_km * 0.171
+    carpool_co2 = distance_km * 0.068
+    shared_savings = max(0, (solo_co2 - carpool_co2) * len(matched_users))
+
+    return jsonify({
+        'success': True,
+        'matched_users': matched_users,
+        'shared_savings_kg': round(shared_savings, 2),
+    })
+
 
 # ══════════════════════════════════════════════════════════════
 #  ECO HUB — Events & News (kept as JSON files, not user data)
@@ -1533,6 +1625,98 @@ def strava_demo_activities():
 
 
 # ══════════════════════════════════════════════════════════════
+#  LIVE CHAT & FRIEND SYNC ENGINE (Step 1)
+# ══════════════════════════════════════════════════════════════
+
+CHATS_FILE = "data/chats.json"
+
+def load_chats():
+    if os.path.exists(CHATS_FILE):
+        try:
+            with open(CHATS_FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception as e:
+            logger.error("Failed to load chats: %s", e)
+    return []
+
+def save_chat(msg):
+    chats = load_chats()
+    chats.append(msg)
+    try:
+        os.makedirs(os.path.dirname(CHATS_FILE), exist_ok=True)
+        with open(CHATS_FILE, "w", encoding="utf-8") as f:
+            json.dump(chats, f, indent=2, ensure_ascii=False)
+    except Exception as e:
+        logger.error("Failed to save chat message: %s", e)
+
+@app.route('/api/chats', methods=['GET'])
+def get_chats():
+    user = get_acting_user()
+    if not user:
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    chats = load_chats()
+    user_chats = [c for c in chats if c['sender'] == user.name or c['recipient'] == user.name]
+    return jsonify(user_chats)
+
+@app.route('/api/chat/users', methods=['GET'])
+def get_chat_users():
+    user = get_acting_user()
+    if not user:
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    db_users = User.query.filter(User.name != user.name).all()
+    chat_users = [
+        {'username': u.name, 'department': u.department, 'avatar_url': u.avatar_url}
+        for u in db_users
+    ]
+    
+    if not chat_users:
+        try:
+            with open("data/leaderboard.json", "r", encoding="utf-8") as f:
+                lb_data = json.load(f)
+                for name, info in lb_data.items():
+                    if name != user.name and name not in [u['username'] for u in chat_users]:
+                        chat_users.append({
+                            'username': name,
+                            'department': info.get('department', 'General'),
+                            'avatar_url': None
+                        })
+        except Exception:
+            pass
+            
+    return jsonify(chat_users)
+
+@socketio.on('register')
+def handle_register(data):
+    username = data.get('username')
+    if username:
+        join_room(username)
+        logger.info(f"Socket registered for user: {username} in room: {username}")
+
+@socketio.on('send_message')
+def handle_send_message(data):
+    sender = data.get('sender')
+    recipient = data.get('recipient')
+    text = data.get('text')
+    if not sender or not recipient or not text:
+        return
+    
+    timestamp = datetime.utcnow().isoformat() + 'Z'
+    message = {
+        'sender': sender,
+        'recipient': recipient,
+        'text': text,
+        'timestamp': timestamp
+    }
+    
+    save_chat(message)
+    
+    emit('receive_message', message, to=recipient)
+    emit('receive_message', message, to=sender)
+
+
+# ══════════════════════════════════════════════════════════════
 #  ENTRY POINT
 # ══════════════════════════════════════════════════════════════
 
@@ -1544,13 +1728,5 @@ if __name__ == '__main__':
     debug_mode = os.environ.get("FLASK_DEBUG", "false").lower() == "true"
     port = int(os.environ.get("PORT", 5000))
 
-    if debug_mode:
-        app.run(debug=True, host='0.0.0.0', port=port)
-    else:
-        try:
-            from waitress import serve
-            logger.info("Starting production server (Waitress) on port %s", port)
-            serve(app, host='0.0.0.0', port=port)
-        except ImportError:
-            logger.warning("Waitress not installed — falling back to Flask dev server.")
-            app.run(debug=False, host='0.0.0.0', port=port)
+    logger.info("Starting Socket.IO server on port %s", port)
+    socketio.run(app, host='0.0.0.0', port=port, debug=debug_mode, allow_unsafe_werkzeug=True)

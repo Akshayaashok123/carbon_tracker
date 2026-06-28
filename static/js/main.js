@@ -153,6 +153,7 @@ function updateLivePreview() {
 const NAV_ITEMS = [
   { id:'dashboard',  icon:'🏠', label:'Home'       },
   { id:'calculate',  icon:'📝', label:'Log'        },
+  { id:'messages',   icon:'💬', label:'Chat'       },
   { id:'leaderboard',icon:'🏆', label:'Rankings'   },
   { id:'deptbattle', icon:'⚔️', label:'Battle'     },
   { id:'badges',     icon:'🏅', label:'Badges'     },

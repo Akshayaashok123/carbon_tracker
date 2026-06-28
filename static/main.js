@@ -4,6 +4,12 @@
   const selectedCoords = { origin: null, destination: null };
   let _lbCurrentTab = 'overall';
 
+  // Chat engine state
+  let activeChatRecipient = null;
+  let chatMessages = [];
+  let chatUsersList = [];
+  let unreadMessages = {};
+
   // ── XSS SANITIZATION ──────────────────────────────────────
   function escapeHTML(str) {
     if (str == null) return '';
@@ -134,6 +140,7 @@
     if (screenId === "screen-ecohub") loadEcoHub();
     if (screenId === "screen-activity") loadActivity();
     if (screenId === "screen-green-wallet") loadWallet();
+    if (screenId === "s-messages") loadChatsUI();
     
     // ... existing logic ...
     
@@ -587,12 +594,28 @@
     // Dev-mode fallback login (name-based, only when Google OAuth not configured)
     const nameInp = document.getElementById("loginName");
     const deptInp = document.getElementById("loginDept");
+    const errorEl = document.getElementById("loginName-error");
     
     const rawName = nameInp?.value.trim();
     if (!rawName) {
-      nameInp.style.borderColor = "#f87171";
-      nameInp.placeholder = "Name is required!";
+      if (nameInp) {
+        nameInp.classList.add("input-error");
+        nameInp.setAttribute("aria-invalid", "true");
+      }
+      if (errorEl) {
+        errorEl.textContent = "Full name is required to start your journey.";
+        errorEl.style.display = "block";
+      }
       return;
+    } else {
+      if (nameInp) {
+        nameInp.classList.remove("input-error");
+        nameInp.removeAttribute("aria-invalid");
+      }
+      if (errorEl) {
+        errorEl.style.display = "none";
+        errorEl.textContent = "";
+      }
     }
 
     fetch('/auth/dev-login', {
@@ -632,11 +655,27 @@
       nav.style.display = 'flex';
       nav.style.opacity = '1';
     }
+
+    // Initialize global WebSocket connection
+    if (typeof io !== "undefined" && !window.socket) {
+      window.socket = io();
+      window.socket.on('connect', () => {
+        console.log("⚡ Chat Connected as " + SESSION.username);
+        window.socket.emit('register', { username: SESSION.username });
+      });
+      window.socket.on('receive_message', (msg) => {
+        handleIncomingMessage(msg);
+      });
+    }
     
     if (typeof SFX !== 'undefined') SFX.catch();
   }
 
   window.logout = function() {
+    if (window.socket) {
+      window.socket.disconnect();
+      window.socket = null;
+    }
     fetch('/auth/logout', { method: 'POST' })
     .then(() => {
       SESSION.username = '';
@@ -1198,6 +1237,78 @@
     const loader = document.getElementById("loader-overlay");
     const uname = SESSION.username || localStorage.getItem("eco_user");
     if (!uname) return alert("Please log in first.");
+
+    // Accessible Validation Checks
+    const originInp = document.getElementById("originInp");
+    const destInp = document.getElementById("destInp");
+    const elecInp = document.getElementById("elecHours");
+    
+    const originErr = document.getElementById("originInp-error");
+    const destErr = document.getElementById("destInp-error");
+    const elecErr = document.getElementById("elecHours-error");
+    
+    let isValid = true;
+    
+    if (originInp) {
+      if (!originInp.value.trim()) {
+        originInp.classList.add("input-error");
+        originInp.setAttribute("aria-invalid", "true");
+        if (originErr) {
+          originErr.textContent = "Please enter an origin address or landmark.";
+          originErr.style.display = "block";
+        }
+        isValid = false;
+      } else {
+        originInp.classList.remove("input-error");
+        originInp.removeAttribute("aria-invalid");
+        if (originErr) {
+          originErr.style.display = "none";
+          originErr.textContent = "";
+        }
+      }
+    }
+    
+    if (destInp) {
+      if (!destInp.value.trim()) {
+        destInp.classList.add("input-error");
+        destInp.setAttribute("aria-invalid", "true");
+        if (destErr) {
+          destErr.textContent = "Please enter a destination on campus.";
+          destErr.style.display = "block";
+        }
+        isValid = false;
+      } else {
+        destInp.classList.remove("input-error");
+        destInp.removeAttribute("aria-invalid");
+        if (destErr) {
+          destErr.style.display = "none";
+          destErr.textContent = "";
+        }
+      }
+    }
+    
+    if (elecInp) {
+      const hours = parseFloat(elecInp.value);
+      if (isNaN(hours) || hours < 0 || hours > 24) {
+        elecInp.classList.add("input-error");
+        elecInp.setAttribute("aria-invalid", "true");
+        if (elecErr) {
+          elecErr.textContent = "Energy usage hours must be a number between 0 and 24.";
+          elecErr.style.display = "block";
+        }
+        isValid = false;
+      } else {
+        elecInp.classList.remove("input-error");
+        elecInp.removeAttribute("aria-invalid");
+        if (elecErr) {
+          elecErr.style.display = "none";
+          elecErr.textContent = "";
+        }
+      }
+    }
+    
+    if (!isValid) return;
+
     if (btn) btn.disabled = true;
     if (loader) loader.style.display = "flex";
 
@@ -1626,5 +1737,195 @@
       }
     });
   });
+
+  // ── LIVE CHAT & FRIEND SYNC ENGINE ───────────────────────
+  async function loadChatsUI() {
+    const listEl = document.getElementById("chat-user-list");
+    if (listEl) listEl.innerHTML = "<div style='text-align:center; padding:30px; color:var(--text-dim);'>Syncing friends...</div>";
+
+    try {
+      // 1. Fetch all other users
+      const usersRes = await fetch("/api/chat/users");
+      chatUsersList = await usersRes.json();
+
+      // 2. Fetch chat history
+      const chatsRes = await fetch("/api/chats");
+      chatMessages = await chatsRes.json();
+
+      // Render the sidebar list of friends
+      renderFriendsList();
+
+      // If there is an active chat recipient, select them again to load messages
+      if (activeChatRecipient) {
+        selectActiveChat(activeChatRecipient);
+      }
+    } catch (err) {
+      console.error("Failed to load chat UI:", err);
+      if (listEl) listEl.innerHTML = "<div style='text-align:center; padding:30px; color:#f87171;'>Sync offline.</div>";
+    }
+  }
+
+  function renderFriendsList() {
+    const listEl = document.getElementById("chat-user-list");
+    if (!listEl) return;
+
+    if (chatUsersList.length === 0) {
+      listEl.innerHTML = "<div style='text-align:center; padding:30px; color:var(--text-dim);'>No other users found.</div>";
+      return;
+    }
+
+    listEl.innerHTML = chatUsersList.map(u => {
+      const isSelected = activeChatRecipient === u.username;
+      const initial = escapeHTML(u.username.charAt(0).toUpperCase());
+      const h = [...u.username].reduce((acc, c) => acc + c.charCodeAt(0), 0) % 360;
+      const avatarStyle = `background: linear-gradient(135deg, hsl(${h}, 60%, 40%), hsl(${(h+30)%360}, 70%, 25%));`;
+      
+      const unreadBadge = unreadMessages[u.username] 
+        ? `<span class="chat-unread-dot"></span>` 
+        : ``;
+
+      return `
+        <div class="chat-user-item ${isSelected ? 'active' : ''}" onclick="selectActiveChat('${escapeHTML(u.username)}')">
+          <div class="chat-user-avatar" style="${avatarStyle}">
+            ${initial}
+          </div>
+          <div class="chat-user-info">
+            <div class="chat-user-name">${escapeHTML(u.username)}</div>
+            <div class="chat-user-dept">${escapeHTML(u.department || 'General')}</div>
+          </div>
+          ${unreadBadge}
+        </div>
+      `;
+    }).join("");
+  }
+
+  function selectActiveChat(recipient) {
+    activeChatRecipient = recipient;
+    delete unreadMessages[recipient]; // clear unread state for this user
+
+    // Re-render sidebar to update active item state & remove unread dot
+    renderFriendsList();
+
+    // Find recipient details
+    const friend = chatUsersList.find(u => u.username === recipient) || { username: recipient, department: "General" };
+
+    // Update active chat window header
+    document.getElementById("active-chat-username").textContent = friend.username;
+    document.getElementById("active-chat-dept").textContent = friend.department;
+
+    const initial = escapeHTML(friend.username.charAt(0).toUpperCase());
+    const h = [...friend.username].reduce((acc, c) => acc + c.charCodeAt(0), 0) % 360;
+    const avatarEl = document.getElementById("active-chat-avatar");
+    if (avatarEl) {
+      avatarEl.textContent = initial;
+      avatarEl.style.background = `linear-gradient(135deg, hsl(${h}, 60%, 40%), hsl(${(h+30)%360}, 70%, 25%))`;
+    }
+
+    // Toggle active chat window visibility
+    document.getElementById("chat-empty-state").style.display = "none";
+    document.getElementById("chat-active-window").style.display = "flex";
+
+    // Render conversation messages
+    renderChatMessages();
+  }
+
+  function renderChatMessages() {
+    const feedEl = document.getElementById("chat-message-feed");
+    if (!feedEl) return;
+
+    // Filter messages for active chat thread
+    const thread = chatMessages.filter(m => 
+      (m.sender === SESSION.username && m.recipient === activeChatRecipient) ||
+      (m.sender === activeChatRecipient && m.recipient === SESSION.username)
+    );
+
+    if (thread.length === 0) {
+      feedEl.innerHTML = `<div style="text-align:center; padding:40px 0; color:var(--text-dim); font-size:0.85rem; font-style:italic;">No messages yet. Say hi! 👋</div>`;
+      return;
+    }
+
+    feedEl.innerHTML = thread.map(m => {
+      const isOutgoing = m.sender === SESSION.username;
+      const bubbleClass = isOutgoing ? "outgoing" : "incoming";
+      
+      // Format timestamp (HH:MM)
+      let timeStr = "";
+      if (m.timestamp) {
+        try {
+          const d = new Date(m.timestamp);
+          timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        } catch(e) {
+          timeStr = "";
+        }
+      }
+
+      return `
+        <div class="chat-bubble-wrapper ${bubbleClass}">
+          <div class="chat-bubble">
+            ${escapeHTML(m.text)}
+          </div>
+          <span class="chat-bubble-time">${timeStr}</span>
+        </div>
+      `;
+    }).join("");
+
+    // Auto scroll to bottom
+    setTimeout(() => {
+      feedEl.scrollTop = feedEl.scrollHeight;
+    }, 50);
+  }
+
+  function sendChatMessage() {
+    const inp = document.getElementById("chat-message-input");
+    if (!inp) return;
+    const textVal = inp.value.trim();
+    if (!textVal) return;
+
+    if (!window.socket || !window.socket.connected) {
+      alert("Chat is offline. Reconnecting...");
+      if (window.socket) window.socket.connect();
+      return;
+    }
+
+    // Emit send_message event
+    window.socket.emit("send_message", {
+      sender: SESSION.username,
+      recipient: activeChatRecipient,
+      text: textVal
+    });
+
+    inp.value = "";
+    inp.focus();
+  }
+
+  function handleIncomingMessage(msg) {
+    // Append to local message array if not duplicate
+    const exists = chatMessages.some(m => m.timestamp === msg.timestamp && m.sender === msg.sender && m.text === msg.text);
+    if (!exists) {
+      chatMessages.push(msg);
+    }
+
+    // Check if the message is in the current open conversation thread
+    if (activeChatRecipient && (
+      (msg.sender === activeChatRecipient && msg.recipient === SESSION.username) ||
+      (msg.sender === SESSION.username && msg.recipient === activeChatRecipient)
+    )) {
+      renderChatMessages();
+    } else {
+      // Message is from another user, mark as unread in sidebar
+      if (msg.sender !== SESSION.username) {
+        unreadMessages[msg.sender] = true;
+        renderFriendsList();
+        
+        // Play notification sound
+        if (typeof playTone === "function") playTone(880, 0.15, "sine", 0.05);
+      }
+    }
+  }
+
+  // Bind handlers to window so HTML templates can invoke them
+  window.loadChatsUI = loadChatsUI;
+  window.selectActiveChat = selectActiveChat;
+  window.sendChatMessage = sendChatMessage;
 
 })();
