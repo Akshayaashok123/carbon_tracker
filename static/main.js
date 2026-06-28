@@ -1765,16 +1765,56 @@
     }
   }
 
+  let _chatSearchQuery = "";
+  window.filterChatUsers = function(query) {
+    _chatSearchQuery = query.toLowerCase().trim();
+    renderFriendsList();
+  };
+
+  window.startChatWithCustomUser = function(name) {
+    const exists = chatUsersList.some(u => u.username.toLowerCase() === name.toLowerCase());
+    if (!exists) {
+      chatUsersList.push({ username: name, department: "General", avatar_url: null });
+    }
+    
+    // Clear search query and search input
+    const searchInp = document.getElementById("chat-user-search");
+    if (searchInp) searchInp.value = "";
+    _chatSearchQuery = "";
+    
+    selectActiveChat(name);
+  };
+
   function renderFriendsList() {
     const listEl = document.getElementById("chat-user-list");
     if (!listEl) return;
 
-    if (chatUsersList.length === 0) {
-      listEl.innerHTML = "<div style='text-align:center; padding:30px; color:var(--text-dim);'>No other users found.</div>";
+    let filteredList = chatUsersList;
+    if (_chatSearchQuery) {
+      filteredList = chatUsersList.filter(u => 
+        u.username.toLowerCase().includes(_chatSearchQuery) || 
+        (u.department && u.department.toLowerCase().includes(_chatSearchQuery))
+      );
+    }
+
+    if (filteredList.length === 0) {
+      if (_chatSearchQuery) {
+        listEl.innerHTML = `
+          <div style='text-align:center; padding:20px 0; color:var(--text-dim); font-size:0.85rem;'>
+            <p style='margin-bottom:12px;'>No matching users found.</p>
+            <div class="chat-user-item" onclick="startChatWithCustomUser('${escapeHTML(_chatSearchQuery)}')" style="border: 1px solid rgba(74, 222, 128, 0.2); background: rgba(74, 222, 128, 0.05); justify-content: center; gap: 8px;">
+              <span>💬</span>
+              <span style="font-weight:800; color:var(--primary);">Text "${escapeHTML(_chatSearchQuery)}"</span>
+            </div>
+          </div>
+        `;
+      } else {
+        listEl.innerHTML = "<div style='text-align:center; padding:30px; color:var(--text-dim);'>No other users found.</div>";
+      }
       return;
     }
 
-    listEl.innerHTML = chatUsersList.map(u => {
+    listEl.innerHTML = filteredList.map(u => {
       const isSelected = activeChatRecipient === u.username;
       const initial = escapeHTML(u.username.charAt(0).toUpperCase());
       const h = [...u.username].reduce((acc, c) => acc + c.charCodeAt(0), 0) % 360;
@@ -1922,6 +1962,63 @@
       }
     }
   }
+
+  window.shareCarbonFootprint = function() {
+    const total = document.getElementById("dash-total")?.textContent || "0.0";
+    const inp = document.getElementById("chat-message-input");
+    if (!inp) return;
+    
+    inp.value = `My daily carbon footprint is ${total} kg CO2e today! Let's keep working together to protect our environment. 🌿🌎`;
+    window.sendChatMessage();
+  };
+
+  window.showInviteEventModal = async function() {
+    const modal = document.getElementById("invite-event-modal");
+    const listEl = document.getElementById("invite-events-list");
+    if (!modal || !listEl) return;
+    
+    modal.style.display = "flex";
+    listEl.innerHTML = "<div style='color:var(--text-dim); text-align:center;'>Loading events...</div>";
+    
+    try {
+      if (!_ecohubEvents || _ecohubEvents.length === 0) {
+        const res = await fetch("/api/eco-events");
+        const data = await res.json();
+        _ecohubEvents = data.events || [];
+      }
+      
+      if (_ecohubEvents.length === 0) {
+        listEl.innerHTML = "<div style='color:var(--text-dim); text-align:center;'>No events available to invite.</div>";
+        return;
+      }
+      
+      listEl.innerHTML = _ecohubEvents.map(e => `
+        <div class="chat-user-item" style="border: 1px solid rgba(255,255,255,0.05); margin-bottom: 0; padding: 12px; display: flex; align-items: center;" onclick="sendEventInvitation('${escapeHTML(e.title)}', '${escapeHTML(e.date)}', '${escapeHTML(e.location)}')">
+          <span style="font-size: 1.8rem; margin-right: 12px; line-height: 1;">${e.emoji}</span>
+          <div style="flex: 1; text-align: left;">
+             <div style="font-weight: 700; color: white; font-size: 0.90rem;">${escapeHTML(e.title)}</div>
+             <div style="font-size: 0.75rem; color: var(--text-dim); margin-top: 2px;">${escapeHTML(e.date)} • ${escapeHTML(e.location)}</div>
+          </div>
+        </div>
+      `).join("");
+    } catch (err) {
+      listEl.innerHTML = "<div style='color:#f87171; text-align:center;'>Failed to load events.</div>";
+    }
+  };
+
+  window.closeInviteEventModal = function() {
+    const modal = document.getElementById("invite-event-modal");
+    if (modal) modal.style.display = "none";
+  };
+
+  window.sendEventInvitation = function(title, date, location) {
+    const inp = document.getElementById("chat-message-input");
+    if (!inp) return;
+    
+    inp.value = `Hey! I'm interested in the "${title}" event on ${date} at ${location}. Let's go together! 🌿📅`;
+    window.closeInviteEventModal();
+    window.sendChatMessage();
+  };
 
   // Bind handlers to window so HTML templates can invoke them
   window.loadChatsUI = loadChatsUI;
