@@ -656,9 +656,11 @@
       nav.style.opacity = '1';
     }
 
-    // Initialize global WebSocket connection
+    // Initialize global WebSocket connection using polling transport for maximum compatibility
     if (typeof io !== "undefined" && !window.socket) {
-      window.socket = io();
+      window.socket = io({
+        transports: ['polling']
+      });
       window.socket.on('connect', () => {
         console.log("⚡ Chat Connected as " + SESSION.username);
         window.socket.emit('register', { username: SESSION.username });
