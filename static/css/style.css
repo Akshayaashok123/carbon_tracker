@@ -313,7 +313,8 @@ input:focus, select:focus {
 }
 
 .nav-item.active { color: var(--primary); }
-.nav-icon { display: block; font-size: 1.5rem; margin-bottom: 4px; }
+.nav-icon { display: block; font-size: 1.5rem; margin-bottom: 2px; }
+.nav-text { display: block; font-size: 0.65rem; }
 
 /* ═══════════════════════════════════════════
    6. VISUALS
@@ -1058,14 +1059,26 @@ input:focus, select:focus {
         font-size: 1.2rem;
     }
     .bottom-nav {
-        height: 70px;
-        padding: 0 8px;
+        height: 60px;
+        padding: 4px 8px;
+        bottom: 12px;
+        left: 12px;
+        right: 12px;
+        border-radius: 20px;
+        align-items: center;
     }
     .nav-icon {
-        font-size: 1.1rem;
+        font-size: 1.4rem;
+        margin-bottom: 0;
+    }
+    .nav-text {
+        display: none;
     }
     .nav-item {
-        font-size: 0.55rem;
+        padding: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     .card {
         padding: 18px;

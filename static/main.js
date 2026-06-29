@@ -114,7 +114,7 @@
     
     // Always hide nav on onboarding screen, or if no session
     const nav = document.getElementById("mainNav");
-    const isLoginScreen = (screenId === 'screen-onboarding');
+    const isLoginScreen = (screenId === 'screen-onboarding' && !hasActiveSession);
 
     if (!hasActiveSession && !isLoginScreen) {
       console.log("🔒 Restricted Access: Redirecting to login");
@@ -1873,8 +1873,10 @@
     // 3. Listen for OAuth callbacks from popups
     window.addEventListener('message', async (event) => {
       if (event.data === 'strava_connected') {
-        const btn = document.getElementById("stravaConnectBtnOnboarding");
-        if (btn) btn.innerHTML = "✅ Strava Linked";
+        const btn1 = document.getElementById("stravaConnectBtnOnboarding");
+        if (btn1) btn1.innerHTML = "✅ Strava Linked";
+        const btn2 = document.getElementById("stravaConnectBtn");
+        if (btn2) btn2.innerHTML = "✅ Strava Linked";
         alert("Strava Account Linked! 🚴 Your activities will be synced.");
       }
     });
