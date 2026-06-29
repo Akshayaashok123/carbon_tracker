@@ -133,9 +133,23 @@ def get_current_user():
                 "avatar_url": user.avatar_url,
                 "points": user.points,
                 "total_calories": user.total_calories,
+                "onboarded": user.onboarded,
             },
         })
     return jsonify({"authenticated": False})
+
+
+@auth_bp.route("/api/complete-onboarding", methods=["POST"])
+@login_required
+def complete_onboarding():
+    """Mark the current user as onboarded in the database."""
+    try:
+        current_user.onboarded = True
+        db.session.commit()
+        return jsonify({"success": True, "user": current_user.to_dict()})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
 @auth_bp.route("/api/update-profile", methods=["POST"])
@@ -162,11 +176,11 @@ def update_profile():
 @auth_bp.route("/auth/dev-login", methods=["POST"])
 def dev_login():
     """
-    Simple name-based login for local development when Google OAuth
-    credentials are not configured. Disabled in production.
+    Simple name-based login for local development when DEV_MODE is enabled.
+    Disabled in production by default.
     """
-    if current_app.config.get("GOOGLE_CLIENT_ID"):
-        return jsonify({"success": False, "error": "Use Google login"}), 403
+    if not current_app.config.get("DEV_MODE"):
+        return jsonify({"success": False, "error": "Dev mode is disabled"}), 403
 
     data = request.json or {}
     name = data.get("name", "").strip()[:100]

@@ -38,7 +38,7 @@ logger = logging.getLogger(__name__)
 
 # ── App Factory ───────────────────────────────────────────────
 from config import Config
-from models import db, User, DailyLog, UserBadge, EventInterest
+from models import db, User, DailyLog, UserBadge, EventInterest, Squad, SquadMember
 from auth import init_auth
 from flask_socketio import SocketIO, emit, join_room
 
@@ -333,7 +333,7 @@ def add_header(response):
 def not_found(e):
     if request.path.startswith('/api/'):
         return jsonify({"success": False, "error": "Endpoint not found"}), 404
-    return render_template('index.html'), 404
+    return render_template('index.html', dev_mode=Config.DEV_MODE), 404
 
 @app.errorhandler(500)
 def server_error(e):
@@ -347,7 +347,7 @@ def server_error(e):
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', dev_mode=Config.DEV_MODE)
 
 
 @app.route('/api/health')
@@ -550,6 +550,8 @@ def calculate_carbon():
         d_lat, d_lon = None, None
         if manual_dist is not None:
             dist_km = float(manual_dist)
+            if dist_km < 0 or dist_km > 100:
+                return jsonify({'success': False, 'error': 'Commute distance must be between 0 and 100 km.'}), 400
             commute_co2 = round(dist_km * co2_per_km, 2)
             fastest = cheapest = greenest = None
             
@@ -581,6 +583,8 @@ def calculate_carbon():
                 greenest = green_f.result() if (selected_route and selected_route['dist'] <= 15) else cheapest
 
             dist_km = selected_route['dist'] if selected_route else 0
+            if dist_km > 100:
+                return jsonify({'success': False, 'error': 'Commute distance exceeds limit for campus tracking (max 100 km). Please enter campus landmarks.'}), 400
             commute_co2 = selected_route['co2'] if selected_route else 0
 
         # Calculate grid intensity dynamically based on location
@@ -853,9 +857,28 @@ def ocr_receipt():
 #  SAVE ENTRY (DB-backed)
 # ══════════════════════════════════════════════════════════════
 
+from collections import defaultdict
+import time
+
+SUBMISSION_LIMIT_WINDOW = 10.0  # seconds
+ip_submissions_cache = defaultdict(float)
+
+def check_submission_rate_limit(ip):
+    now = time.time()
+    last_sub = ip_submissions_cache[ip]
+    if now - last_sub < SUBMISSION_LIMIT_WINDOW:
+        return False
+    ip_submissions_cache[ip] = now
+    return True
+
+
 @app.route('/api/save-entry', methods=['POST'])
 def save_entry():
     try:
+        ip = request.headers.get("X-Forwarded-For", request.remote_addr or "127.0.0.1").split(",")[0].strip()
+        if not check_submission_rate_limit(ip):
+            return jsonify({'success': False, 'error': 'Rate limit exceeded. Please wait 10 seconds before submitting another log.'}), 429
+
         data = request.json
         raw_user = data.get('username', 'Anonymous').strip() or 'Anonymous'
         username = ''.join(c for c in raw_user if c.isalnum() or c in ' ._-')[:50] or 'Anonymous'
@@ -912,6 +935,18 @@ def save_entry():
         all_badges, streak, new_badges = compute_badges_and_streak(user)
 
         db.session.commit()
+
+        # Check if user belongs to any squad and notify members in real-time
+        try:
+            memberships = SquadMember.query.filter_by(user_id=user.id).all()
+            for m in memberships:
+                socketio.emit("squad_activity", {
+                    "squad_name": m.squad.name,
+                    "user": user.name,
+                    "message": f"🌿 {user.name} logged an activity ({total:.1f} kg CO2 today)!"
+                }, to=m.squad.name)
+        except Exception as se:
+            logger.error("Squad notification failed: %s", se)
 
         # Return badge details so frontend can celebrate
         new_badge_details = [
@@ -1146,16 +1181,261 @@ def get_ranking():
         return jsonify({'error': str(e)}), 500
 
 
+def calculate_streak(user):
+    from datetime import date, timedelta
+    logs = user.daily_logs.all()
+    if not logs:
+        return 0, False
+
+    # Get unique dates in descending order
+    log_dates = sorted(list(set(l.date for l in logs)), reverse=True)
+    today = date.today()
+    yesterday = today - timedelta(days=1)
+
+    # Check if user has logged today or yesterday
+    if log_dates[0] != today and log_dates[0] != yesterday:
+        # Streak broken
+        return 0, False
+
+    streak = 1
+    current_date = log_dates[0]
+    for d in log_dates[1:]:
+        if current_date - d == timedelta(days=1):
+            streak += 1
+            current_date = d
+        elif current_date - d == timedelta(days=0):
+            continue
+        else:
+            break
+            
+    logged_today = log_dates[0] == today
+    return streak, logged_today
+
+
 @app.route('/api/profile/<username>', methods=['GET'])
 def get_profile(username):
     try:
         user = User.query.filter_by(name=username).first()
         if not user:
-            return jsonify({'daily_logs': []})
+            return jsonify({'daily_logs': [], 'streak': 0, 'logged_today': False})
         logs = [l.to_dict() for l in user.daily_logs.order_by(DailyLog.date).all()]
-        return jsonify({'daily_logs': logs})
+        streak, logged_today = calculate_streak(user)
+        return jsonify({
+            'daily_logs': logs,
+            'streak': streak,
+            'logged_today': logged_today
+        })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/weekly-report', methods=['GET'])
+@login_required
+def get_weekly_report():
+    """Generate weekly carbon report card metrics comparing current and past week."""
+    try:
+        user = current_user
+        from datetime import date, timedelta
+        today = date.today()
+        seven_days_ago = today - timedelta(days=7)
+        fourteen_days_ago = today - timedelta(days=14)
+
+        logs = user.daily_logs.all()
+        this_week_logs = [l for l in logs if l.date >= seven_days_ago]
+        last_week_logs = [l for l in logs if l.date >= fourteen_days_ago and l.date < seven_days_ago]
+
+        this_week_total = sum(l.total for l in this_week_logs)
+        last_week_total = sum(l.total for l in last_week_logs)
+
+        # Average per day
+        this_week_avg = this_week_total / len(this_week_logs) if this_week_logs else 0.0
+        last_week_avg = last_week_total / len(last_week_logs) if last_week_logs else 0.0
+
+        if last_week_avg > 0:
+            pct_change = round(((this_week_avg - last_week_avg) / last_week_avg) * 100, 1)
+        else:
+            pct_change = 0.0
+
+        # Find best day (lowest carbon in this week's logs)
+        best_day = None
+        if this_week_logs:
+            best_log = min(this_week_logs, key=lambda l: l.total)
+            best_day = {
+                'date': best_log.date.isoformat(),
+                'total': round(best_log.total, 2)
+            }
+
+        # Tip determination based on highest source
+        transport_sum = sum(l.total - (l.food_value or 0) - (l.elec_co2 or 0) for l in this_week_logs)
+        food_sum = sum(l.food_value or 0 for l in this_week_logs)
+        elec_sum = sum(l.elec_co2 or 0 for l in this_week_logs)
+
+        if transport_sum >= food_sum and transport_sum >= elec_sum:
+            tip = "Try walking or cycling to nearby campus blocks to cut down commute emissions. 🚲"
+        elif food_sum >= transport_sum and food_sum >= elec_sum:
+            tip = "Consider opting for a plant-based meal today. Vegan/vegetarian options save up to 70% food carbon! 🥗"
+        elif elec_sum >= transport_sum and elec_sum >= food_sum:
+            tip = "Unplug device chargers when not in use and turn off lights to optimize standby energy. ⚡"
+        else:
+            tip = "Great job! Keep monitoring your daily footprint to sustain a green lifestyle. 🌿"
+
+        return jsonify({
+            'success': True,
+            'this_week_avg': round(this_week_avg, 2),
+            'last_week_avg': round(last_week_avg, 2),
+            'percentage_change': pct_change,
+            'best_day': best_day,
+            'tip': tip
+        })
+    except Exception as e:
+        logger.exception("weekly-report failed")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/squads', methods=['POST'])
+@login_required
+def create_squad():
+    """Create a new squad and automatically add the creator as its first member."""
+    try:
+        data = request.json or {}
+        name = data.get("name", "").strip()
+        weekly_goal = float(data.get("weekly_goal", 20.0))
+        
+        if not name:
+            return jsonify({"success": False, "error": "Squad name is required"}), 400
+            
+        # Check if name exists
+        existing = Squad.query.filter_by(name=name).first()
+        if existing:
+            return jsonify({"success": False, "error": "Squad name already taken"}), 400
+            
+        squad = Squad(name=name, weekly_goal=weekly_goal)
+        db.session.add(squad)
+        db.session.flush()
+        
+        # Add creator
+        member = SquadMember(squad_id=squad.id, user_id=current_user.id)
+        db.session.add(member)
+        db.session.commit()
+        
+        return jsonify({"success": True, "message": f"Squad '{name}' created successfully!"})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route('/api/squads', methods=['GET'])
+@login_required
+def get_squads():
+    """Retrieve squads the current user belongs to, including weekly carbon progress."""
+    try:
+        memberships = SquadMember.query.filter_by(user_id=current_user.id).all()
+        squad_list = []
+        
+        from datetime import date, timedelta
+        today = date.today()
+        seven_days_ago = today - timedelta(days=7)
+        
+        for m in memberships:
+            squad = m.squad
+            members = squad.members.all()
+            member_names = [mem.user.name for mem in members]
+            
+            # Calculate total squad carbon this week
+            total_co2 = 0
+            for mem in members:
+                logs = mem.user.daily_logs.filter(DailyLog.date >= seven_days_ago).all()
+                total_co2 += sum(l.total for l in logs)
+                
+            squad_list.append({
+                "id": squad.id,
+                "name": squad.name,
+                "weekly_goal": squad.weekly_goal,
+                "current_co2": round(total_co2, 2),
+                "members": member_names,
+                "member_count": len(member_names)
+            })
+            
+        return jsonify({"success": True, "squads": squad_list})
+    except Exception as e:
+        jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route('/api/squads/join', methods=['POST'])
+@login_required
+def join_squad():
+    """Join an existing squad by name (enforcing a maximum of 5 members per squad)."""
+    try:
+        data = request.json or {}
+        name = data.get("name", "").strip()
+        
+        if not name:
+            return jsonify({"success": False, "error": "Squad name is required"}), 400
+            
+        squad = Squad.query.filter_by(name=name).first()
+        if not squad:
+            return jsonify({"success": False, "error": "Squad not found"}), 404
+            
+        current_count = squad.members.count()
+        if current_count >= 5:
+            return jsonify({"success": False, "error": "Squad is already full (max 5 members)"}), 400
+            
+        existing = SquadMember.query.filter_by(squad_id=squad.id, user_id=current_user.id).first()
+        if existing:
+            return jsonify({"success": False, "error": "You are already a member of this squad"}), 400
+            
+        member = SquadMember(squad_id=squad.id, user_id=current_user.id)
+        db.session.add(member)
+        db.session.commit()
+        
+        # Emit update notification via socket
+        socketio.emit("squad_updated", {"squad_name": squad.name, "message": f"{current_user.name} joined squad!"})
+        
+        return jsonify({"success": True, "message": f"Successfully joined squad '{squad.name}'!"})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route('/api/food-lookup/<barcode>', methods=['GET'])
+@login_required
+def food_lookup(barcode):
+    """Proxy lookup to Open Food Facts API to retrieve product name and carbon category estimate."""
+    try:
+        url = f"https://world.openfoodfacts.org/api/v0/product/{barcode}.json"
+        res = requests.get(url, headers={"User-Agent": "EcoTracker - CampusApp - Version 1.0"}, timeout=5)
+        if res.status_code != 200:
+            return jsonify({"success": False, "error": "Food database offline"}), 502
+            
+        data = res.json()
+        if data.get("status") == 1:
+            product = data.get("product", {})
+            name = product.get("product_name", "Unknown Food Item")
+            
+            # Simple carbon estimation logic based on categories
+            categories = product.get("categories_tags", [])
+            categories_str = ", ".join(categories).lower()
+            
+            co2_est = 1.5  # default vegetarian level
+            if any(x in categories_str for x in ["beef", "mutton", "lamb", "steak"]):
+                co2_est = 5.2
+            elif any(x in categories_str for x in ["pork", "chicken", "poultry", "meat"]):
+                co2_est = 2.5
+            elif any(x in categories_str for x in ["dairy", "cheese", "milk", "butter"]):
+                co2_est = 2.0
+            elif any(x in categories_str for x in ["vegetable", "fruit", "vegan", "plant", "salad"]):
+                co2_est = 0.8
+                
+            return jsonify({
+                "success": True,
+                "name": name,
+                "co2_estimate": co2_est
+            })
+        else:
+            return jsonify({"success": False, "error": "Product not found"}), 404
+    except Exception as e:
+        logger.exception("food-lookup failed")
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
 @app.route('/api/admin', methods=['GET'])
@@ -1694,6 +1974,13 @@ def handle_register(data):
         join_room(username)
         logger.info(f"Socket registered for user: {username} in room: {username}")
 
+@socketio.on('join_squad_room')
+def handle_join_squad_room(data):
+    squad_name = data.get('squad_name')
+    if squad_name:
+        join_room(squad_name)
+        logger.info(f"Socket joined room for squad: {squad_name}")
+
 @socketio.on('send_message')
 def handle_send_message(data):
     sender = data.get('sender')
@@ -1720,10 +2007,28 @@ def handle_send_message(data):
 #  ENTRY POINT
 # ══════════════════════════════════════════════════════════════
 
+def upgrade_db_schema():
+    """Dynamically add new columns or tables if they do not exist in the database."""
+    from sqlalchemy import text
+    try:
+        # Check SQLite or Postgres for onboarded column
+        db.session.execute(text("SELECT onboarded FROM users LIMIT 1"))
+    except Exception:
+        db.session.rollback()
+        logger.info("Column 'onboarded' not found in 'users' table. Running ALTER TABLE...")
+        try:
+            db.session.execute(text("ALTER TABLE users ADD COLUMN onboarded BOOLEAN DEFAULT FALSE"))
+            db.session.commit()
+            logger.info("Successfully added 'onboarded' column to 'users' table.")
+        except Exception as e:
+            db.session.rollback()
+            logger.error("Failed to add 'onboarded' column: %s", e)
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-        logger.info("Database tables created/verified.")
+        upgrade_db_schema()
+        logger.info("Database tables created/verified and schema upgraded.")
 
     debug_mode = os.environ.get("FLASK_DEBUG", "false").lower() == "true"
     port = int(os.environ.get("PORT", 5000))

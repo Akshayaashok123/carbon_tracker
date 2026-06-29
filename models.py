@@ -23,6 +23,7 @@ class User(UserMixin, db.Model):
     avatar_url = db.Column(db.String(500), nullable=True)
     points = db.Column(db.Integer, default=0)
     total_calories = db.Column(db.Integer, default=0)
+    onboarded = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Relationships
@@ -86,6 +87,7 @@ class User(UserMixin, db.Model):
             "avatar_url": self.avatar_url,
             "points": self.points,
             "total_calories": self.total_calories,
+            "onboarded": self.onboarded,
             "level": lvl,
             "level_title": title,
             "level_progress": prog,
@@ -179,3 +181,35 @@ class EventInterest(db.Model):
 
     def __repr__(self):
         return f"<EventInterest user={self.user_id} event={self.event_id!r}>"
+
+
+class Squad(db.Model):
+    """
+    A team squad of up to 5 users working together toward a carbon reduction goal.
+    """
+    __tablename__ = "squads"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), unique=True, nullable=False)
+    weekly_goal = db.Column(db.Float, default=20.0)  # total CO2 target limit
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relationships
+    members = db.relationship("SquadMember", backref="squad", lazy="dynamic", cascade="all, delete-orphan")
+
+
+class SquadMember(db.Model):
+    """
+    Junction table for Squad members.
+    """
+    __tablename__ = "squad_members"
+
+    id = db.Column(db.Integer, primary_key=True)
+    squad_id = db.Column(db.Integer, db.ForeignKey("squads.id", ondelete="CASCADE"), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    joined_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    __table_args__ = (
+        db.UniqueConstraint("squad_id", "user_id", name="uq_squad_member"),
+    )
+    user = db.relationship("User")

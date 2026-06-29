@@ -1,0 +1,14 @@
+[
+  {
+    "sender": "test_user",
+    "recipient": "test_user",
+    "text": "Hello from automated test",
+    "timestamp": "2026-06-24T06:34:07.280745Z"
+  },
+  {
+    "sender": "test_user",
+    "recipient": "test_user",
+    "text": "Hello from automated auth test",
+    "timestamp": "2026-06-24T06:34:40.714492Z"
+  }
+]

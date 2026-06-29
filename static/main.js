@@ -21,6 +21,22 @@
       .replace(/'/g, '&#039;');
   }
 
+  // Toast notifications utility
+  window.showToast = function (message) {
+    const container = document.getElementById("toast-container");
+    if (!container) return;
+    const toast = document.createElement("div");
+    toast.className = "toast";
+    toast.textContent = message;
+    container.appendChild(toast);
+    setTimeout(() => {
+      toast.classList.add("toast-out");
+      toast.addEventListener("animationend", () => {
+        toast.remove();
+      });
+    }, 3000);
+  };
+
   const GAME = {
     running: false, paused: false, duration: 45, score: 0, target: 14,
     timeLeft: 45, timerId: null, rafId: null, level: 1, combo: 0, maxCombo: 0,
@@ -134,8 +150,14 @@
     const activeNav = Array.from(document.querySelectorAll(".nav-item")).find(n => n.getAttribute("onclick")?.includes(screenId));
     if (activeNav) activeNav.classList.add("active");
 
-    if (screenId === "screen-dashboard") loadDashboard();
-    if (screenId === "screen-leaderboard") { _lbCurrentTab = 'overall'; loadLeaderboard('overall'); }
+    if (screenId === "screen-dashboard") {
+      loadDashboard();
+      if (SESSION.username && !SESSION.onboarded) {
+        const modal = document.getElementById("onboarding-modal");
+        if (modal) modal.style.display = "flex";
+      }
+    }
+    if (screenId === "screen-leaderboard") { _lbCurrentTab = 'overall'; loadLeaderboard('overall'); loadSquads(); }
     if (screenId === "screen-badges") loadBadges();
     if (screenId === "screen-ecohub") loadEcoHub();
     if (screenId === "screen-activity") loadActivity();
@@ -158,6 +180,8 @@
     if (hasSession && form && profile) {
       form.style.display = "none";
       profile.style.display = "block";
+      const moreSection = document.getElementById("profile-more-section");
+      if (moreSection) moreSection.style.display = "block";
       document.getElementById("profile-name").textContent = SESSION.username;
       document.getElementById("profile-dept").textContent = SESSION.department;
       
@@ -173,6 +197,11 @@
           if (progressEl) {
             const pct = Math.min(100, ((data.level_progress || 0) / (data.level_threshold || 500)) * 100);
             progressEl.style.width = `${pct}%`;
+          }
+          const profileTreeWrapper = document.getElementById("profile-tree-wrapper");
+          if (profileTreeWrapper) {
+            const treeStage = Math.min(4, Math.floor((data.points || 0) / 500));
+            profileTreeWrapper.innerHTML = renderTreeSVG(treeStage);
           }
         }).catch(err => console.error(err));
       
@@ -196,6 +225,8 @@
     } else if (form && profile) {
       form.style.display = "block";
       profile.style.display = "none";
+      const moreSection = document.getElementById("profile-more-section");
+      if (moreSection) moreSection.style.display = "none";
     }
   };
 
@@ -572,6 +603,7 @@
       if (data.success) {
         if (data.interested) {
           _ecohubMyInterests.push(eventId);
+          window.showToast("Event saved! See you there 🌱");
         } else {
           _ecohubMyInterests = _ecohubMyInterests.filter(id => id !== eventId);
         }
@@ -618,6 +650,12 @@
       }
     }
 
+    const btn = document.getElementById("devLoginBtn");
+    if (btn) {
+      btn.disabled = true;
+      btn.classList.add("btn-loading");
+    }
+
     fetch('/auth/dev-login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -625,6 +663,10 @@
     })
     .then(r => r.json())
     .then(data => {
+      if (btn) {
+        btn.disabled = false;
+        btn.classList.remove("btn-loading");
+      }
       if (data.success && data.user) {
         setSession(data.user);
         window.showScreen('screen-dashboard');
@@ -633,6 +675,10 @@
       }
     })
     .catch(err => {
+      if (btn) {
+        btn.disabled = false;
+        btn.classList.remove("btn-loading");
+      }
       console.error('Dev login error:', err);
       alert('Could not connect to server.');
     });
@@ -643,6 +689,7 @@
     SESSION.department = user.department || 'General';
     SESSION.email = user.email || '';
     SESSION.avatar_url = user.avatar_url || '';
+    SESSION.onboarded = user.onboarded || false;
     
     // Persistence (used as fallback for API calls that still use username)
     localStorage.setItem('eco_user', SESSION.username);
@@ -664,9 +711,27 @@
       window.socket.on('connect', () => {
         console.log("⚡ Chat Connected as " + SESSION.username);
         window.socket.emit('register', { username: SESSION.username });
+        
+        // Fetch squads and join their rooms
+        fetch('/api/squads')
+          .then(r => r.json())
+          .then(data => {
+            if (data.success && data.squads) {
+              data.squads.forEach(s => {
+                window.socket.emit('join_squad_room', { squad_name: s.name });
+              });
+            }
+          }).catch(err => console.error(err));
       });
       window.socket.on('receive_message', (msg) => {
         handleIncomingMessage(msg);
+      });
+      window.socket.on('squad_activity', (msg) => {
+        window.showToast(msg.message);
+      });
+      window.socket.on('squad_updated', (msg) => {
+        window.showToast(msg.message);
+        loadSquads();
       });
     }
     
@@ -786,6 +851,19 @@
       const logs = profileData.daily_logs || [];
       const latestLog = logs.length > 0 ? logs[logs.length - 1] : null;
 
+      // Toggle dashboard empty state card
+      const emptyStateEl = document.getElementById("dash-empty-state-area");
+      const mainContentEl = document.getElementById("dash-main-content-area");
+      if (emptyStateEl && mainContentEl) {
+        if (logs.length === 0) {
+          emptyStateEl.style.display = "block";
+          mainContentEl.style.display = "none";
+        } else {
+          emptyStateEl.style.display = "none";
+          mainContentEl.style.display = "block";
+        }
+      }
+
       // Update top bar user level indicator
       const topLvlEl = document.getElementById("top-user-level");
       if (topLvlEl) topLvlEl.textContent = `Lvl ${badgeData.level || 1}`;
@@ -858,6 +936,58 @@
 
       // Render weekly trend chart
       renderTrendChart(logs.slice(-7));
+
+      // Render daily streak banner
+      const bannerContainer = document.getElementById("streak-banner-container");
+      if (bannerContainer) {
+        if (profileData.streak > 0) {
+          bannerContainer.innerHTML = `
+            <div class="streak-banner active">
+              <span>🔥</span>
+              <span>${profileData.streak}-day streak! Log today to keep it going</span>
+            </div>
+          `;
+        } else if (logs.length > 0) {
+          bannerContainer.innerHTML = `
+            <div class="streak-banner broken">
+              <span>💪</span>
+              <span>Your streak ended. Start a new one today!</span>
+            </div>
+          `;
+        } else {
+          bannerContainer.innerHTML = "";
+        }
+      }
+
+      // Render pulsing orange dot on track icon
+      const trackNav = document.getElementById("nav-track");
+      if (trackNav) {
+        const existingDot = trackNav.querySelector(".streak-pulse-dot");
+        if (existingDot) existingDot.remove();
+        
+        if (profileData.logged_today === false) {
+          const dot = document.createElement("div");
+          dot.className = "streak-pulse-dot";
+          trackNav.appendChild(dot);
+        }
+      }
+
+      // Render Virtual Tree
+      const treeStage = Math.min(4, Math.floor((badgeData.points || 0) / 500));
+      const treeWrapper = document.getElementById("dash-tree-wrapper");
+      if (treeWrapper) {
+        treeWrapper.innerHTML = renderTreeSVG(treeStage);
+      }
+
+      // Weekly Carbon Report Card Monday Trigger
+      const today = new Date();
+      if (today.getDay() === 1) { // Monday
+        const currentWeekStr = getWeekNumber(today);
+        const lastSeenWeek = localStorage.getItem("eco_last_seen_weekly_report");
+        if (lastSeenWeek !== currentWeekStr) {
+          setTimeout(showWeeklyReport, 2000);
+        }
+      }
 
       // Slow operations — fire and forget after UI is rendered
       setTimeout(() => {
@@ -1311,7 +1441,10 @@
     
     if (!isValid) return;
 
-    if (btn) btn.disabled = true;
+    if (btn) {
+      btn.disabled = true;
+      btn.classList.add("btn-loading");
+    }
     if (loader) loader.style.display = "flex";
 
     // 1. Calculate impact
@@ -1393,11 +1526,15 @@
         })
       });
       const saveData = await saveRes.json();
+      if (saveData.success || saveRes.ok) {
+        window.showToast("Footprint logged! +50 XP 🌿");
+      }
       
       // Display new badges if any
       const badgeSection = document.getElementById("new-badges-section");
       const badgeList = document.getElementById("new-badges-list");
       if (saveData.new_badges && saveData.new_badges.length > 0) {
+        window.showToast("Badge unlocked! 🏆");
         badgeList.innerHTML = saveData.new_badges.map(b => `
           <div class="achievement" style="min-width:140px; margin-right:10px; border:2px solid var(--primary);">
             <div class="icon">${b.emoji}</div>
@@ -1424,7 +1561,10 @@
       console.error(err);
       alert("Connectivity error. Results may not have saved."); 
     } finally { 
-      if (btn) btn.disabled = false; 
+      if (btn) {
+        btn.disabled = false; 
+        btn.classList.remove("btn-loading");
+      }
       if (loader) loader.style.display = "none"; 
     }
   };
@@ -1936,6 +2076,7 @@
       text: textVal
     });
 
+    window.showToast("Sent ✓");
     inp.value = "";
     inp.focus();
   }
@@ -2026,5 +2167,472 @@
   window.loadChatsUI = loadChatsUI;
   window.selectActiveChat = selectActiveChat;
   window.sendChatMessage = sendChatMessage;
+
+  // ── FIRST-TIME USER ONBOARDING FLOW ────────────────────────
+  let _onboardCurrentStep = 1;
+  window.nextOnboardStep = function(step) {
+    _onboardCurrentStep = step;
+    document.querySelectorAll(".onboard-step").forEach(s => s.style.display = "none");
+    const target = document.getElementById(`onboard-step-${step}`);
+    if (target) target.style.display = "block";
+    
+    // Update step indicator text
+    const indicator = document.getElementById("onboard-step-indicator");
+    if (indicator) indicator.textContent = `Step ${step} of 3`;
+    
+    // Update dots
+    for (let i = 1; i <= 3; i++) {
+      const dot = document.getElementById(`onboard-dot-${i}`);
+      if (dot) {
+        dot.style.background = (i === step) ? "var(--primary)" : "rgba(255,255,255,0.1)";
+      }
+    }
+  };
+
+  window.completeOnboardingFlow = async function() {
+    const transport = document.getElementById("onboardTransport").value;
+    const dietVal = parseFloat(document.getElementById("onboardDiet").value);
+    const reminder = document.getElementById("onboardReminder").value;
+    
+    // Pre-fill the calculator fields on the screen
+    const transportSelect = document.getElementById("transportType");
+    if (transportSelect) transportSelect.value = transport;
+    const foodSelect = document.getElementById("foodType");
+    if (foodSelect) foodSelect.value = dietVal;
+    
+    // Auto-prefill coordinates or locations
+    const originInp = document.getElementById("originInp");
+    const destInp = document.getElementById("destInp");
+    if (originInp && !originInp.value.trim()) originInp.value = "Chennai Center";
+    if (destInp && !destInp.value.trim()) destInp.value = "Campus Main Gate";
+    
+    // Save onboarding preferences / reminder
+    if (reminder) {
+      localStorage.setItem("eco_reminder_time", reminder);
+    }
+    
+    // Hide modal
+    const modal = document.getElementById("onboarding-modal");
+    if (modal) modal.style.display = "none";
+    
+    // Show loading indicator
+    const btn = document.getElementById("calcBtn");
+    const loader = document.getElementById("loader-overlay");
+    if (btn) {
+      btn.disabled = true;
+      btn.classList.add("btn-loading");
+    }
+    if (loader) loader.style.display = "flex";
+    
+    try {
+      // Complete onboarding in DB
+      const authRes = await fetch("/api/complete-onboarding", { method: "POST" });
+      const authData = await authRes.json();
+      if (authData.success && authData.user) {
+        SESSION.onboarded = true;
+      }
+      
+      // Auto-submit first log
+      const payload = {
+        username: SESSION.username || localStorage.getItem("eco_user"),
+        department: SESSION.department || "General",
+        transport: transport,
+        food: dietVal,
+        electricity: 4.0,
+        origin: "Chennai Center",
+        destination: "Campus Main Gate",
+        origin_lat: 13.0827,
+        origin_lon: 80.2707,
+        dest_lat: 13.0827,
+        dest_lon: 80.2707,
+        smart_food_co2: 0,
+        smart_food_calories: 0
+      };
+
+      // Calculate
+      const calcRes = await fetch("/api/calculate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const calcData = await calcRes.json();
+      
+      // Save entry
+      const saveRes = await fetch("/api/save-entry", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: payload.username,
+          department: payload.department,
+          total: calcData.total,
+          transport: payload.transport,
+          food_value: payload.food, 
+          elec_co2: calcData.breakdown.electricity,
+          calories: 0
+        })
+      });
+      const saveData = await saveRes.json();
+      
+      window.showToast("Onboarding complete! +50 XP 🌿");
+      window.showToast("Footprint logged! 🌱");
+      
+      // Reload dashboard with new data
+      window.showScreen("screen-dashboard");
+    } catch (err) {
+      console.error("Onboarding error:", err);
+      window.showToast("Error setting up footprint.");
+      window.showScreen("screen-dashboard");
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.classList.remove("btn-loading");
+      }
+      if (loader) loader.style.display = "none";
+    }
+  };
+
+  // ── SQUAD SYSTEM ──────────────────────────────────────────
+  window.openCreateSquadModal = function() {
+    const modal = document.getElementById("create-squad-modal");
+    if (modal) modal.style.display = "flex";
+  };
+  
+  window.closeCreateSquadModal = function() {
+    const modal = document.getElementById("create-squad-modal");
+    if (modal) modal.style.display = "none";
+  };
+  
+  window.submitCreateSquad = async function() {
+    const name = document.getElementById("squadNameInp").value.trim();
+    const weeklyGoal = parseFloat(document.getElementById("squadGoalInp").value) || 20;
+    
+    if (!name) return alert("Please enter a squad name");
+    
+    try {
+      const res = await fetch("/api/squads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, weekly_goal: weeklyGoal })
+      });
+      const data = await res.json();
+      if (data.success) {
+        window.showToast("Squad created! 👥");
+        window.closeCreateSquadModal();
+        if (window.socket) window.socket.emit("join_squad_room", { squad_name: name });
+        loadSquads();
+      } else {
+        alert(data.error || "Failed to create squad");
+      }
+    } catch(err) {
+      console.error(err);
+    }
+  };
+
+  window.openJoinSquadModal = function() {
+    const modal = document.getElementById("join-squad-modal");
+    if (modal) modal.style.display = "flex";
+  };
+  
+  window.closeJoinSquadModal = function() {
+    const modal = document.getElementById("join-squad-modal");
+    if (modal) modal.style.display = "none";
+  };
+  
+  window.submitJoinSquad = async function() {
+    const name = document.getElementById("joinSquadNameInp").value.trim();
+    if (!name) return alert("Please enter squad name to join");
+    
+    try {
+      const res = await fetch("/api/squads/join", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name })
+      });
+      const data = await res.json();
+      if (data.success) {
+        window.showToast("Squad joined! 👥");
+        window.closeJoinSquadModal();
+        if (window.socket) window.socket.emit("join_squad_room", { squad_name: name });
+        loadSquads();
+      } else {
+        alert(data.error || "Failed to join squad");
+      }
+    } catch(err) {
+      console.error(err);
+    }
+  };
+
+  async function loadSquads() {
+    const user = SESSION.username || localStorage.getItem("eco_user");
+    if (!user) return;
+    
+    const container = document.getElementById("squads-container");
+    if (!container) return;
+    
+    try {
+      const res = await fetch("/api/squads");
+      const data = await res.json();
+      
+      if (data.success && data.squads && data.squads.length > 0) {
+        container.innerHTML = data.squads.map(s => {
+          const pct = Math.min(100, Math.round((s.current_co2 / s.weekly_goal) * 100));
+          const progressColor = (s.current_co2 > s.weekly_goal) ? "#ef4444" : "var(--primary)";
+          
+          return `
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 16px; border-radius: 16px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="font-weight: 800; font-size: 1.0rem; color: white;">${escapeHTML(s.name)}</span>
+                <span style="font-size: 0.75rem; color: var(--text-dim); font-weight: 700;">${s.members.length}/5 members</span>
+              </div>
+              <div style="font-size: 0.8rem; color: var(--text-dim); margin-bottom: 12px; text-align: left;">
+                Members: <span style="color: white; font-weight: 700;">${s.members.map(escapeHTML).join(", ")}</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; font-weight: 800; margin-bottom: 6px;">
+                <span style="color: ${progressColor};">Progress: ${s.current_co2.toFixed(1)} kg</span>
+                <span style="color: var(--text-dim);">Limit: ${s.weekly_goal} kg</span>
+              </div>
+              <div style="height: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden;">
+                <div style="height: 100%; width: ${pct}%; background: ${progressColor}; transition: width 0.5s;"></div>
+              </div>
+            </div>
+          `;
+        }).join("");
+      } else {
+        container.innerHTML = `<p style="color: var(--text-dim); font-size: 0.85rem; text-align: center; padding: 10px 0; margin: 0;">You aren't in any squads yet. Team up with friends to hit carbon reduction targets! 🤝</p>`;
+      }
+    } catch (err) {
+      console.error("Failed to load squads:", err);
+      container.innerHTML = `<p style="color: #f87171; font-size: 0.85rem; text-align: center; padding: 10px 0; margin: 0;">Failed to load squads.</p>`;
+    }
+  }
+
+  // ── BARCODE FOOD SCANNER ──────────────────────────────────
+  let _barcodeStream = null;
+  let _barcodeInterval = null;
+  
+  window.openBarcodeScanner = async function() {
+    const modal = document.getElementById("barcode-scanner-modal");
+    const video = document.getElementById("barcode-video");
+    const status = document.getElementById("barcode-status");
+    
+    if (modal) modal.style.display = "flex";
+    if (status) status.textContent = "Requesting camera access...";
+    
+    try {
+      _barcodeStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+      if (video) {
+        video.srcObject = _barcodeStream;
+        if (status) status.textContent = "Position barcode within scanning view.";
+      }
+      
+      // Native Barcode Detection Loop
+      if ("BarcodeDetector" in window) {
+        const detector = new BarcodeDetector({ formats: ["ean_13", "ean_8", "upc_a", "upc_e", "code_128"] });
+        _barcodeInterval = setInterval(async () => {
+          try {
+            const barcodes = await detector.detect(video);
+            if (barcodes.length > 0) {
+              const code = barcodes[0].rawValue;
+              window.lookupBarcode(code);
+            }
+          } catch(e) {}
+        }, 800);
+      } else {
+        if (status) status.textContent = "Point camera at barcode or select manual/mock option below.";
+      }
+    } catch(err) {
+      console.warn("Camera access denied or unavailable:", err);
+      if (status) status.textContent = "Camera unavailable. Use manual/mock scanning below.";
+    }
+  };
+
+  window.closeBarcodeScanner = function() {
+    const modal = document.getElementById("barcode-scanner-modal");
+    if (modal) modal.style.display = "none";
+    
+    // Stop camera tracks
+    if (_barcodeStream) {
+      _barcodeStream.getTracks().forEach(t => t.stop());
+      _barcodeStream = null;
+    }
+    if (_barcodeInterval) {
+      clearInterval(_barcodeInterval);
+      _barcodeInterval = null;
+    }
+  };
+
+  window.simulateBarcodeScan = function(val) {
+    if (val) {
+      document.getElementById("manualBarcodeInp").value = val;
+      window.lookupBarcode(val);
+    }
+  };
+
+  window.lookupBarcode = async function(barcode) {
+    if (!barcode) return alert("Please enter a barcode number");
+    
+    const status = document.getElementById("barcode-status");
+    if (status) status.textContent = `Looking up ${barcode}...`;
+    
+    try {
+      const res = await fetch(`/api/food-lookup/${barcode}`);
+      const data = await res.json();
+      if (data.success) {
+        window.closeBarcodeScanner();
+        
+        // Show result on Track Page
+        const smartRes = document.getElementById("smartFoodResult");
+        const smartStatus = document.getElementById("smartFoodStatus");
+        const smartCO2 = document.getElementById("smartFoodImpact");
+        const detectedItems = document.getElementById("detectedItemsList");
+        
+        if (smartRes && smartStatus && smartCO2 && detectedItems) {
+          smartStatus.innerHTML = `🛒 Scanned: <span style="color:white;">${escapeHTML(data.name)}</span>`;
+          smartCO2.value = data.co2_estimate;
+          detectedItems.innerHTML = `Estimated carbon footprint: <strong>${data.co2_estimate} kg CO2e/meal</strong>`;
+          smartRes.style.display = "block";
+          
+          window.showToast("Product scanned! CO2 estimate loaded. 🌱");
+        }
+      } else {
+        if (status) status.textContent = `Error: ${data.error || "Food item not found."}`;
+      }
+    } catch(err) {
+      console.error(err);
+      if (status) status.textContent = "Lookup failed. Network or database error.";
+    }
+  };
+
+  // ── WEEKLY REPORT CARD ────────────────────────────────────
+  function getWeekNumber(d) {
+    d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+    var yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    var weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+    return d.getUTCFullYear() + "-W" + weekNo;
+  }
+
+  let _weeklyReportData = null;
+  window.showWeeklyReport = async function() {
+    try {
+      const res = await fetch("/api/weekly-report");
+      const data = await res.json();
+      if (!data.success) return;
+      
+      _weeklyReportData = data;
+      
+      document.getElementById("weekly-report-this-avg").textContent = `${data.this_week_avg.toFixed(1)} kg`;
+      document.getElementById("weekly-report-last-avg").textContent = `${data.last_week_avg.toFixed(1)} kg`;
+      
+      const changeEl = document.getElementById("weekly-report-change");
+      if (data.percentage_change < 0) {
+        changeEl.textContent = `${data.percentage_change}% (Improved! 🌿)`;
+        changeEl.style.color = "var(--primary)";
+      } else if (data.percentage_change > 0) {
+        changeEl.textContent = `+${data.percentage_change}% (Increased ⚠️)`;
+        changeEl.style.color = "#f87171";
+      } else {
+        changeEl.textContent = "0.0% (No Change)";
+        changeEl.style.color = "var(--text-dim)";
+      }
+      
+      const bestCard = document.getElementById("weekly-report-best-day-card");
+      const bestVal = document.getElementById("weekly-report-best-day-val");
+      if (data.best_day && bestCard && bestVal) {
+        bestCard.style.display = "block";
+        const bestDate = new Date(data.best_day.date).toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+        bestVal.textContent = `${bestDate} (${data.best_day.total.toFixed(1)} kg)`;
+      } else if (bestCard) {
+        bestCard.style.display = "none";
+      }
+      
+      document.getElementById("weekly-report-tip").textContent = data.tip || "Keep up the green efforts!";
+      
+      const modal = document.getElementById("weekly-report-modal");
+      if (modal) modal.style.display = "flex";
+      
+      const currentWeekStr = getWeekNumber(new Date());
+      localStorage.setItem("eco_last_seen_weekly_report", currentWeekStr);
+    } catch(err) {
+      console.error("Failed to load weekly report:", err);
+    }
+  };
+
+  window.closeWeeklyReport = function() {
+    const modal = document.getElementById("weekly-report-modal");
+    if (modal) modal.style.display = "none";
+  };
+
+  window.shareWeeklyReport = function() {
+    if (!_weeklyReportData) return;
+    const msg = `My Weekly Carbon Report Card 📊\n- This Week Avg: ${_weeklyReportData.this_week_avg.toFixed(1)} kg\n- Change: ${_weeklyReportData.percentage_change}%\n- Best Day: ${_weeklyReportData.best_day ? _weeklyReportData.best_day.total.toFixed(1) + ' kg' : '-'}\n\nJoin me in protecting the campus environment on EcoTracker! 🌿🌎`;
+    navigator.clipboard.writeText(msg).then(() => {
+      window.showToast("Report card copied to clipboard! 📋");
+    }).catch(() => {
+      alert("Failed to copy report. Copy it manually.");
+    });
+  };
+
+  // ── VIRTUAL TREE GROWER SVG ─────────────────────────────────
+  function renderTreeSVG(stage) {
+    let content = "";
+    if (stage === 0) { // Seed
+      content = `
+        <circle cx="50" cy="80" r="4" fill="#854d0e" />
+        <path d="M10 85 L90 85" stroke="#78716c" stroke-width="3" stroke-linecap="round" />
+      `;
+    } else if (stage === 1) { // Sprout
+      content = `
+        <path d="M50 85 Q50 65 55 60" fill="none" stroke="#854d0e" stroke-width="3" stroke-linecap="round" />
+        <path d="M55 60 Q45 50 40 55 C40 62 48 60 55 60" fill="#22c55e" />
+        <path d="M10 85 L90 85" stroke="#78716c" stroke-width="3" stroke-linecap="round" />
+      `;
+    } else if (stage === 2) { // Sapling
+      content = `
+        <path d="M50 85 Q50 50 53 45" fill="none" stroke="#854d0e" stroke-width="4" stroke-linecap="round" />
+        <path d="M51 65 Q40 55 35 60 C35 67 45 65 51 65" fill="#22c55e" />
+        <path d="M52 55 Q65 48 70 53 C70 60 60 58 52 55" fill="#22c55e" />
+        <path d="M53 45 Q45 35 45 40 C45 47 50 45 53 45" fill="#4ade80" />
+        <path d="M10 85 L90 85" stroke="#78716c" stroke-width="3" stroke-linecap="round" />
+      `;
+    } else if (stage === 3) { // Tree
+      content = `
+        <path d="M50 85 L50 50" stroke="#78350f" stroke-width="8" stroke-linecap="round" />
+        <path d="M50 65 Q35 55 30 60" stroke="#78350f" stroke-width="4" fill="none" />
+        <path d="M50 60 Q65 50 70 55" stroke="#78350f" stroke-width="4" fill="none" />
+        <circle cx="50" cy="40" r="22" fill="#15803d" opacity="0.9" />
+        <circle cx="38" cy="45" r="15" fill="#16a34a" opacity="0.95" />
+        <circle cx="62" cy="45" r="15" fill="#16a34a" opacity="0.95" />
+        <path d="M10 85 L90 85" stroke="#78716c" stroke-width="4" stroke-linecap="round" />
+      `;
+    } else { // Full Tree
+      content = `
+        <path d="M50 85 L50 45" stroke="#451a03" stroke-width="12" stroke-linecap="round" />
+        <path d="M50 60 Q30 50 25 55" stroke="#451a03" stroke-width="5" fill="none" />
+        <path d="M50 55 Q70 45 75 50" stroke="#451a03" stroke-width="5" fill="none" />
+        <circle cx="50" cy="35" r="28" fill="#14532d" />
+        <circle cx="32" cy="40" r="20" fill="#166534" />
+        <circle cx="68" cy="40" r="20" fill="#166534" />
+        <circle cx="50" cy="22" r="18" fill="#22c55e" />
+        <circle cx="40" cy="30" r="2.5" fill="#ef4444" />
+        <circle cx="60" cy="35" r="2.5" fill="#ef4444" />
+        <circle cx="52" cy="45" r="2.5" fill="#ef4444" />
+        <circle cx="30" cy="48" r="2.5" fill="#ef4444" />
+        <path d="M10 85 L90 85" stroke="#44403c" stroke-width="5" stroke-linecap="round" />
+      `;
+    }
+    
+    const stageNames = ["Seed", "Sprout", "Sapling", "Tree", "Full Tree"];
+    return `
+      <div class="tree-container" style="position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;" title="Keep logging to grow your tree 🌳 (Stage: ${stageNames[stage]})">
+        <svg viewBox="0 0 100 100" width="100%" height="100%">
+          ${content}
+        </svg>
+      </div>
+    `;
+  }
+
+  // Bind new handlers to window so HTML templates can invoke them
+  window.loadSquads = loadSquads;
 
 })();

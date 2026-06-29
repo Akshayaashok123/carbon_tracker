@@ -1420,4 +1420,181 @@ input:focus, select:focus {
     background: rgba(0, 0, 0, 0.35) !important;
     outline: none;
     box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.25) !important;
-}
+}
+
+/* ── Skeleton Loaders ──────────────────────────────────────── */
+.skeleton {
+    background: linear-gradient(90deg,
+        rgba(255,255,255,0.04) 25%,
+        rgba(255,255,255,0.08) 50%,
+        rgba(255,255,255,0.04) 75%);
+    background-size: 200% 100%;
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+    border-radius: 12px;
+}
+@keyframes skeleton-pulse {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+.skeleton-text {
+    height: 14px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+}
+.skeleton-text.short { width: 40%; }
+.skeleton-text.medium { width: 65%; }
+.skeleton-text.long { width: 90%; }
+.skeleton-card {
+    height: 160px;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.04);
+}
+.skeleton-circle {
+    border-radius: 50%;
+}
+.skeleton-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+}
+.skeleton-row .skeleton-circle {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+}
+.skeleton-row .skeleton-text {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+/* ── Toast Notifications ───────────────────────────────────── */
+#toast-container {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    pointer-events: none;
+}
+.toast {
+    background: rgba(10, 30, 20, 0.95);
+    border: 1px solid rgba(74, 222, 128, 0.35);
+    color: #e0ffe8;
+    padding: 14px 28px;
+    border-radius: 14px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    backdrop-filter: blur(16px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 20px rgba(74, 222, 128, 0.15);
+    animation: toast-in 0.35s var(--ease) forwards;
+    pointer-events: auto;
+    max-width: 90vw;
+    text-align: center;
+}
+.toast.toast-out {
+    animation: toast-out 0.3s var(--ease) forwards;
+}
+@keyframes toast-in {
+    0%   { opacity: 0; transform: translateY(20px) scale(0.95); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes toast-out {
+    0%   { opacity: 1; transform: translateY(0) scale(1); }
+    100% { opacity: 0; transform: translateY(-10px) scale(0.95); }
+}
+
+/* ── Empty State Card ──────────────────────────────────────── */
+.empty-state-card {
+    text-align: center;
+    padding: 60px 30px;
+    border-radius: 30px;
+    background: rgba(255,255,255,0.02);
+    border: 1px dashed rgba(74, 222, 128, 0.2);
+}
+.empty-state-card h2 {
+    font-size: 1.6rem;
+    font-weight: 900;
+    margin: 16px 0 8px 0;
+}
+.empty-state-card p {
+    color: var(--text-dim);
+    font-size: 0.95rem;
+    margin-bottom: 24px;
+    line-height: 1.5;
+}
+
+/* ── Streak Banner ─────────────────────────────────────────── */
+.streak-banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    border-radius: 16px;
+    font-weight: 800;
+    font-size: 0.9rem;
+    margin-bottom: 24px;
+    animation: streak-glow 2s ease-in-out infinite alternate;
+}
+.streak-banner.active {
+    background: rgba(251, 146, 60, 0.1);
+    border: 1px solid rgba(251, 146, 60, 0.3);
+    color: #fb923c;
+}
+.streak-banner.broken {
+    background: rgba(248, 113, 113, 0.08);
+    border: 1px solid rgba(248, 113, 113, 0.2);
+    color: #f87171;
+}
+@keyframes streak-glow {
+    0%   { box-shadow: 0 0 0 rgba(251, 146, 60, 0); }
+    100% { box-shadow: 0 0 20px rgba(251, 146, 60, 0.08); }
+}
+.streak-pulse-dot {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #fb923c;
+    animation: pulse-dot 1.5s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: 0.5; transform: scale(1.4); }
+}
+
+/* ── Button Loading State ──────────────────────────────────── */
+.btn-loading {
+    pointer-events: none;
+    opacity: 0.7;
+    position: relative;
+}
+.btn-loading::after {
+    content: '';
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    border: 2px solid transparent;
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: btn-spin 0.6s linear infinite;
+    margin-left: 8px;
+    display: inline-block;
+    vertical-align: middle;
+}
+@keyframes btn-spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes scan-line {
+    0%   { top: 10%; }
+    50%  { top: 90%; }
+    100% { top: 10%; }
+}
+

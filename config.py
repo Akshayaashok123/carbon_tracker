@@ -41,6 +41,9 @@ class Config:
         "STRAVA_REDIRECT_URI", "http://localhost:5000/api/strava/callback"
     )
 
+    # ── Dev Mode ──────────────────────────────────────────────
+    DEV_MODE = os.environ.get("DEV_MODE", "").lower() in ("true", "1", "yes")
+
     # ── App Constants ─────────────────────────────────────────
     GREEN_DAY_LIMIT = 5.0
     MAX_LEADERBOARD_SIZE = 15

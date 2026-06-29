@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "title": "Green Campus Hackathon",
+    "location": "Engineering Building",
+    "lat": 13.0827,
+    "lon": 80.2707,
+    "date_time": "2026-07-15T10:00:00",
+    "description": "A 24\u2011hour hackathon focused on sustainability solutions for campus life.",
+    "attendees_joined_ride": [
+      "testuser"
+    ]
+  },
+  {
+    "id": 2,
+    "title": "Campus Tree\u2011Planting Day",
+    "location": "Central Park",
+    "lat": 13.084,
+    "lon": 80.272,
+    "date_time": "2026-07-20T09:00:00",
+    "description": "Students and staff gather to plant native trees around the campus.",
+    "attendees_joined_ride": []
+  },
+  {
+    "id": 3,
+    "title": "Sustainable Transportation Workshop",
+    "location": "Auditorium",
+    "lat": 13.0805,
+    "lon": 80.2695,
+    "date_time": "2026-07-25T14:00:00",
+    "description": "Learn about car\u2011pooling, bike\u2011sharing, and public\u2011transport options.",
+    "attendees_joined_ride": []
+  },
+  {
+    "id": 4,
+    "title": "Eco\u2011Film Screening",
+    "location": "Media Center",
+    "lat": 13.0833,
+    "lon": 80.2711,
+    "date_time": "2026-07-30T18:00:00",
+    "description": "Screening of documentaries on climate action followed by discussion.",
+    "attendees_joined_ride": []
+  }
+]
